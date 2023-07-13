@@ -10,11 +10,11 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ERROR_DB } from 'src/constants';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { User } from 'src/auth/entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -24,8 +24,6 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
 
     private readonly dataSource: DataSource,
-
-    private readonly jwtService: JwtService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -52,9 +50,15 @@ export class UsersService {
 
   async findAll(paginationDto: PaginationDto) {
     const { limit = 10, offset = 0 } = paginationDto;
-    return this.userRepository.find({
+    const users = await this.userRepository.find({
       take: limit,
       skip: offset,
+      // relations: ['roles'],
+    });
+
+    return users.map((user) => {
+      console.log('user', user);
+      return { ...user, roles: user.roles.map((r) => r.name) };
     });
   }
 
@@ -66,8 +70,20 @@ export class UsersService {
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.userRepository.preload({
+      id: id,
+      ...updateUserDto,
+    });
+
+    if (!user) throw new NotFoundException(`User with id: ${id} not found`);
+
+    try {
+      await this.userRepository.save(user);
+      return user;
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
   }
 
   async remove(id: number) {

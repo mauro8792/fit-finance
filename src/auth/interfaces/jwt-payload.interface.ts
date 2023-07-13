@@ -1,7 +1,7 @@
 
 
 export interface JwtPayload {
-    id :string
+    id :number
 
     //TODO todo lo que quieras agregar
 }
