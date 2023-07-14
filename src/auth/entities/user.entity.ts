@@ -4,11 +4,14 @@ import {
   BeforeUpdate,
   Column,
   Entity,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Role } from 'src/roles/entities/rol.entity';
 
 @Entity({ name: 'users' })
-export class UserTest {
+export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -36,12 +39,14 @@ export class UserTest {
   @Column('bool', { default: true })
   isActive: boolean;
 
-  @Column('varchar', { default: 'user' })
-  roles: string[];
+  @ManyToMany(() => Role, {eager:true})
+  @JoinTable()
+  roles: Role[];
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {
     this.email = this.email.toLowerCase().trim();
+    this.roles = this.roles.filter((role) => !!role);
   }
 
   @BeforeUpdate()
@@ -49,3 +54,4 @@ export class UserTest {
     this.checkFieldsBeforeInsert();
   }
 }
+
