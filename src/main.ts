@@ -14,7 +14,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true, // te avisa que no puede recibir las key que vienen demas
       transform: true,
       transformOptions: {
-        enableImplicitConversion: true,
+       // enableImplicitConversion: true,
       },
     }),
   );

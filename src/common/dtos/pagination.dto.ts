@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Type } from 'class-transformer';
-import { IsOptional, IsPositive, Min } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
+import { IsOptional, IsPositive, Min, IsBoolean } from 'class-validator';
 
 export class PaginationDto {
   @ApiProperty({
@@ -21,4 +21,13 @@ export class PaginationDto {
   @Min(0)
   @Type(() => Number) // enableImplicitConversions: true
   offset?: number;
+
+  @ApiProperty({
+    default: false,
+    description: 'Indicates if the entity should be active',
+  })
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true')
+  isActive?: boolean;
 }

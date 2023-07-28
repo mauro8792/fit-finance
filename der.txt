@@ -1,0 +1,26 @@
+    +--------------+        +----------------+          +--------------+
+    |   Student    |        |     Payment    |          |    User      |
+    +--------------+        +----------------+          +--------------+
+    | ID           |        | ID             |          | ID           |
+    | Name         |        | Student ID     |          | Email        |
+    | Last Name    |        | Payment Date   |          | Password     |
+    | Date of Birth|        | Amount Paid    |          +--------------+
+    | Phone        |        | Payment Method |          | Roles        |
+    | Start Date   |        |                |
+    | User ID      |        |                |
+    | Sport        |        |                |
+    +--------------+        +----------------+
+          |                      |              |
+          |                      |              |
+          |                      |              |
+    +--------------+     +--------------+     +--------------+
+    |     Fee      |     |    Roles     |     |  Permissions |
+    +--------------+     +--------------+     +--------------+
+    | ID           |     | ID           |     | ID           |
+    | Student ID   |     | Name         |     | Role ID      |
+    | Start Date   |     +--------------+     | Permission   |
+    | End Date     |                          +--------------+
+    | Value        |
+    +--------------+
+
+https://chat.openai.com/share/fa5852b6-4ca0-405b-be62-e7fb6b6c1dd1
