@@ -15,6 +15,7 @@ import { JwtPayload } from './interfaces';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto, LoginUserDto } from './dto';
 import { Role } from 'src/roles/entities/rol.entity';
+import { Student } from 'src/student/entities/student.entity';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +27,9 @@ export class AuthService {
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
 
+    @InjectRepository(Student)
+    private studentRepository: Repository<Student>,
+
     private readonly dataSource: DataSource,
 
     private readonly jwtService: JwtService,
@@ -36,15 +40,25 @@ export class AuthService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
-    const { password, ...userPayload } = createUserDto;
+    const { email, password, ...studentPayload } = createUserDto;
     try {
       const role = await this.roleRepository.findOne({
         where: { name: 'user' },
       });
+
+      if (!role) throw new BadRequestException('Not found role');
+
       const user = await queryRunner.manager.save(User, {
-        ...userPayload,
+        email,
+        fullName: `${studentPayload.lastName}, ${studentPayload.firstName}`,
         roles: [role],
         password: bcrypt.hashSync(password, 10),
+      });
+
+      await queryRunner.manager.save(Student, {
+        ...studentPayload,
+        startDate: new Date(),
+        user,
       });
 
       await queryRunner.commitTransaction();
@@ -90,7 +104,8 @@ export class AuthService {
   }
 
   private handleDBExceptions(error: any) {
-    this.logger.error(error.sqlMessage);
+    
+    this.logger.error(error.sqlMessage || error);
     if (error.code === ERROR_DB.ER_DUP_ENTRY)
       throw new BadRequestException(`${error.sqlMessage} `);
     throw new InternalServerErrorException(

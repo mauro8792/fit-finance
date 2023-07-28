@@ -8,6 +8,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { SportName } from 'src/common/types/sport.enum';
 export class CreateUserDto {
   @ApiProperty({
     example: 'ejemplo@gmail.com',
@@ -28,12 +29,8 @@ export class CreateUserDto {
   password: string;
 
   @IsString()
-  @MinLength(8)
-  fullName: string;
-
-  @IsString()
   @MinLength(3)
-  name: string;
+  firstName: string;
 
   @IsString()
   @MinLength(3)
@@ -49,5 +46,8 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
-  cellphone: string;
+  phone: string;
+
+  @IsString()
+  sport: SportName;
 }

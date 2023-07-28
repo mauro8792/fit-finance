@@ -28,13 +28,6 @@ export class User {
   @MinLength(8)
   fullName: string;
 
-  @Column('date')
-  birthDate: Date;
-
-  @Column('varchar')
-  @MinLength(7)
-  @MaxLength(9)
-  document: string;
 
   @Column('bool', { default: true })
   isActive: boolean;
