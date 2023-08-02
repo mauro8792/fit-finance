@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { Type, Transform } from 'class-transformer';
-import { IsOptional, IsPositive, Min, IsBoolean } from 'class-validator';
+import { IsOptional, IsPositive, Min, IsBoolean, Max } from 'class-validator';
 
 export class PaginationDto {
   @ApiProperty({
@@ -30,4 +30,20 @@ export class PaginationDto {
   @IsBoolean()
   @Transform(({ value }) => value === 'true')
   isActive?: boolean;
+
+  @ApiProperty({
+    default: new Date().getMonth() + 1,
+  })
+  @IsOptional()
+  @Min(1)
+  @Max(12)
+  @Type(() => Number) // enableImplicitConversions: true
+  month?: number;
+
+  @ApiProperty({
+    default: new Date().getFullYear(),
+  })
+  @IsOptional()
+  @Type(() => Number) // enableImplicitConversions: true
+  year?: number;
 }

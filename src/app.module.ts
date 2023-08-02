@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -10,6 +11,8 @@ import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import { SeedModule } from './seed/seed.module';
 import { StudentModule } from './student/student.module';
+import { FeeModule } from './fee/fee.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -24,6 +27,7 @@ import { StudentModule } from './student/student.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
+     ScheduleModule.forRoot(),
 
     UsersModule,
 
@@ -36,6 +40,10 @@ import { StudentModule } from './student/student.module';
     SeedModule,
 
     StudentModule,
+
+    FeeModule,
+
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
