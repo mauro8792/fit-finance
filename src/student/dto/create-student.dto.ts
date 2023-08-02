@@ -1,5 +1,5 @@
 import { IsBoolean, IsDate, IsOptional, IsString, Matches, MaxLength, MinLength } from "class-validator";
-import { SportName } from "src/common/types/sport.enum";
+import { Sport } from "src/sport/entities/sport.entity";
 
 export class CreateStudentDto {
   @IsString()
@@ -33,7 +33,7 @@ export class CreateStudentDto {
 
   @IsString()
   @IsOptional()
-  sport: SportName;
+  sport: Sport;
 
   @IsOptional()
   @IsBoolean()

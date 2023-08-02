@@ -8,7 +8,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { SportName } from 'src/common/types/sport.enum';
+import { Sport } from 'src/sport/entities/sport.entity';
 export class CreateUserDto {
   @ApiProperty({
     example: 'ejemplo@gmail.com',
@@ -49,5 +49,5 @@ export class CreateUserDto {
   phone: string;
 
   @IsString()
-  sport: SportName;
+  sport: Sport;
 }

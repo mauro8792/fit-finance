@@ -57,7 +57,7 @@ export class AuthService {
 
       await queryRunner.manager.save(Student, {
         ...studentPayload,
-        startDate: new Date(),
+        startDate: new Date(),                
         user,
       });
 

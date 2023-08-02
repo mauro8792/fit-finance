@@ -2,7 +2,15 @@ import { MaxLength, MinLength } from 'class-validator';
 import { SportName } from 'src/common/types/sport.enum';
 import { Fee } from 'src/fee/entities/fee.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Sport } from 'src/sport/entities/sport.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'students' })
 export class Student {
@@ -27,9 +35,6 @@ export class Student {
   @Column('date')
   startDate: Date;
 
-  @Column('varchar')
-  sport: SportName;
-
   @Column('varchar', { unique: true })
   @MinLength(7)
   @MaxLength(9)
@@ -43,4 +48,11 @@ export class Student {
 
   @OneToMany(() => Payment, (payment) => payment.student, { eager: false })
   payments: Payment[];
+
+  // @Column({ nullable: true }) // Hacemos el campo sportId opcional
+  // sportId: number;
+
+  @ManyToOne(() => Sport, (sport) => sport.students)
+  @JoinColumn({ name: 'sportId' })
+  sport: Sport;
 }

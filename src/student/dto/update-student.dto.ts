@@ -7,6 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { SportName } from 'src/common/types/sport.enum';
+import { Sport } from 'src/sport/entities/sport.entity';
 
 export class UpdateStudentDto {
   @IsOptional()
@@ -47,7 +48,7 @@ export class UpdateStudentDto {
   @IsOptional()
   @IsString()
   @IsOptional()
-  sport: SportName;
+  sport: Sport;
 
   @IsOptional()
   @IsBoolean()

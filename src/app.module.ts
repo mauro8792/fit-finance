@@ -13,6 +13,7 @@ import { SeedModule } from './seed/seed.module';
 import { StudentModule } from './student/student.module';
 import { FeeModule } from './fee/fee.module';
 import { PaymentModule } from './payment/payment.module';
+import { SportModule } from './sport/sport.module';
 
 @Module({
   imports: [
@@ -44,6 +45,8 @@ import { PaymentModule } from './payment/payment.module';
     FeeModule,
 
     PaymentModule,
+
+    SportModule,
   ],
   controllers: [AppController],
   providers: [AppService],

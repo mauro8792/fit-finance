@@ -1,4 +1,5 @@
 import { Payment } from "src/payment/entities/payment.entity";
+import { Sport } from "src/sport/entities/sport.entity";
 import { Student } from "src/student/entities/student.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
@@ -31,4 +32,8 @@ export class Fee {
   @ManyToOne(() => Student, (student) => student.fees)
   @JoinColumn({ name: 'studentId' })
   student: Student;
+
+  @ManyToOne(() => Sport, (sport) => sport.fees)
+  @JoinColumn({ name: 'sportId' })
+  sport: Sport;
 }
