@@ -26,10 +26,10 @@ export class Fee {
   @Column()
   year: number;
 
-  @OneToMany(() => Payment, (payment) => payment.fee)
+  @OneToMany(() => Payment, (payment) => payment.fee, { eager: true })
   payments: Payment[];
 
-  @ManyToOne(() => Student, (student) => student.fees)
+  @ManyToOne(() => Student, (student) => student.fees, { eager: true })
   @JoinColumn({ name: 'studentId' })
   student: Student;
 

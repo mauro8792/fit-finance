@@ -1,4 +1,4 @@
-import { IsDateString, IsNumber } from "class-validator";
+import { IsDateString, IsNumber, IsString, Matches } from "class-validator";
 
 export class CreatePaymentDto {
   @IsNumber()
@@ -12,4 +12,7 @@ export class CreatePaymentDto {
 
   @IsNumber()
   feeId: number;
+
+  @IsString()
+  paymentMethod: string;
 }

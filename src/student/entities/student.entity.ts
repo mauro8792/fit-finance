@@ -43,7 +43,7 @@ export class Student {
   @Column('bool', { default: true })
   isActive: boolean;
 
-  @OneToMany(() => Fee, (fee) => fee.student, { eager: true })
+  @OneToMany(() => Fee, (fee) => fee.student, )
   fees: Fee[];
 
   @OneToMany(() => Payment, (payment) => payment.student, { eager: false })
@@ -52,7 +52,7 @@ export class Student {
   // @Column({ nullable: true }) // Hacemos el campo sportId opcional
   // sportId: number;
 
-  @ManyToOne(() => Sport, (sport) => sport.students)
+  @ManyToOne(() => Sport, (sport) => sport.students, {eager:true})
   @JoinColumn({ name: 'sportId' })
   sport: Sport;
 }

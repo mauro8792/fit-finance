@@ -12,6 +12,9 @@ import { UpdateStudentDto, CreateStudentDto } from './dto';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { Student } from './entities/student.entity';
 import { ERROR_DB } from 'src/constants';
+import { Sport } from 'src/sport/entities/sport.entity';
+import { FeeService } from 'src/fee/fee.service';
+import { Fee } from 'src/fee/entities/fee.entity';
 
 @Injectable()
 export class StudentService {
@@ -21,17 +24,45 @@ export class StudentService {
     @InjectRepository(Student)
     private readonly studentRepository: Repository<Student>,
 
+    @InjectRepository(Sport)
+    private readonly sportRepository: Repository<Sport>,
+
+    @InjectRepository(Fee)
+    private readonly feeRepository: Repository<Fee>,
+
     private readonly dataSource: DataSource,
+
+    private readonly feeService: FeeService,
   ) {}
 
   async create(createStudentDto: CreateStudentDto) {
-    const student = this.studentRepository.create(createStudentDto);
-    try {
-      await this.studentRepository.save(student);
+    const { sportId, ...studentPayload } = createStudentDto;
 
-      this.logger.log(`Student created ${student}`);
+    const sport = sportId
+      ? await this.sportRepository.findOneBy({ id: sportId })
+      : '';
+
+    if (!sport)
+      throw new NotFoundException(`Sport with id: ${sportId} not found`);
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const student = await queryRunner.manager.save(Student, {
+        ...studentPayload,
+        sport,
+      });
+
+      await queryRunner.commitTransaction();
+
+      // Llama a la nueva función en StudentService para generar las cuotas
+      await this.generateFeesForNewStudent(student.id);
+
+      this.logger.log(`Student created`);
       return { student };
     } catch (error) {
+      await queryRunner.rollbackTransaction();
       this.handleDBExceptions(error);
     }
   }
@@ -80,9 +111,18 @@ export class StudentService {
   }
 
   async update(id: number, updateStudentDto: UpdateStudentDto) {
+    const { sportId, ...studentPayload } = updateStudentDto;
+    const sport = sportId
+      ? await this.sportRepository.findOneBy({ id: sportId })
+      : '';
+
+    // if (!sport)
+    //   throw new NotFoundException(`Sport with id: ${sportId} not found`);
+
     const student = await this.studentRepository.preload({
       id,
-      ...updateStudentDto,
+      ...studentPayload,
+      ...(sport ? { sport } : {}),
     });
 
     if (!student)
@@ -114,5 +154,47 @@ export class StudentService {
     if (error.code === ERROR_DB.ER_DUP_ENTRY)
       throw new BadRequestException(`${error.sqlMessage} `);
     throw new InternalServerErrorException('Ayuda!');
+  }
+
+  async generateFeesForNewStudent(studentId: number): Promise<void> {
+    const student = await this.studentRepository.findOneBy({ id: studentId });
+
+    if (!student) {
+      throw new NotFoundException(`Student not found with id: ${studentId}`);
+    }
+
+    const today = new Date();
+    const monthsToGenerate = [
+      { month: today.getMonth() + 1, year: today.getFullYear() },
+      { month: today.getMonth() + 2, year: today.getFullYear() },
+      { month: today.getMonth() + 3, year: today.getFullYear() },
+    ];
+
+    for (const monthToGenerate of monthsToGenerate) {
+      const existingFee = await this.feeRepository.findOne({
+        where: {
+          student,
+          month: monthToGenerate.month,
+          year: monthToGenerate.year,
+        },
+      });
+
+      if (!existingFee) {
+        const newFee = this.feeRepository.create({
+          student,
+          startDate: new Date(
+            monthToGenerate.year,
+            monthToGenerate.month - 1,
+            1,
+          ),
+          endDate: new Date(monthToGenerate.year, monthToGenerate.month, 0), // Último día del mes
+          value: student.sport.monthlyFee,
+          amountPaid: 0,
+          month: monthToGenerate.month,
+          year: monthToGenerate.year,
+        });
+        await this.feeRepository.save(newFee);
+      }
+    }
   }
 }

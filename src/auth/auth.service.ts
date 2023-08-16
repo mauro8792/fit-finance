@@ -27,9 +27,6 @@ export class AuthService {
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
 
-    @InjectRepository(Student)
-    private studentRepository: Repository<Student>,
-
     private readonly dataSource: DataSource,
 
     private readonly jwtService: JwtService,
@@ -57,7 +54,7 @@ export class AuthService {
 
       await queryRunner.manager.save(Student, {
         ...studentPayload,
-        startDate: new Date(),                
+        startDate: new Date(),
         user,
       });
 
@@ -104,7 +101,6 @@ export class AuthService {
   }
 
   private handleDBExceptions(error: any) {
-    
     this.logger.error(error.sqlMessage || error);
     if (error.code === ERROR_DB.ER_DUP_ENTRY)
       throw new BadRequestException(`${error.sqlMessage} `);

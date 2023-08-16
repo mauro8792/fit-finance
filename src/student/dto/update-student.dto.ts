@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsNumber,
   IsOptional,
   IsString,
   Matches,
@@ -45,10 +46,9 @@ export class UpdateStudentDto {
   })
   startDate: string;
 
+  @IsNumber()
   @IsOptional()
-  @IsString()
-  @IsOptional()
-  sport: Sport;
+  sportId: number;
 
   @IsOptional()
   @IsBoolean()

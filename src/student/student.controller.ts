@@ -34,6 +34,8 @@ export class StudentController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
+    console.log('dddd', id);
+    
     return this.studentService.update(+id, updateStudentDto);
   }
 

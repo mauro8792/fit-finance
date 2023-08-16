@@ -15,7 +15,10 @@ export class Payment {
   @Column()
   amountPaid: number;
 
-  @ManyToOne(() => Student, (student) => student.payments, {eager:false})
+  @Column('')
+  paymentMethod: string;
+
+  @ManyToOne(() => Student, (student) => student.payments, { eager: false })
   @JoinColumn({ name: 'studentId' })
   student: Student;
 

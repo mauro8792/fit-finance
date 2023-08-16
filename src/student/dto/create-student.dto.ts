@@ -1,4 +1,4 @@
-import { IsBoolean, IsDate, IsOptional, IsString, Matches, MaxLength, MinLength } from "class-validator";
+import { IsBoolean, IsDate, IsNumber, IsOptional, IsString, Matches, MaxLength, MinLength } from "class-validator";
 import { Sport } from "src/sport/entities/sport.entity";
 
 export class CreateStudentDto {
@@ -31,9 +31,9 @@ export class CreateStudentDto {
   })
   startDate: string;
 
-  @IsString()
+  @IsNumber()
   @IsOptional()
-  sport: Sport;
+  sportId: number;
 
   @IsOptional()
   @IsBoolean()

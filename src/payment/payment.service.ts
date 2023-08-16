@@ -24,24 +24,28 @@ export class PaymentService {
     @InjectRepository(Student)
     private readonly studentRepository: Repository<Student>,
 
-    // @InjectRepository(Fee)
-    // private readonly feeRepository: Repository<Fee>,
+    @InjectRepository(Fee)
+    private readonly feeRepository: Repository<Fee>,
 
     private readonly dataSource: DataSource,
   ) {}
 
   async create(createPaymentDto: CreatePaymentDto) {
-    const { studentId, feeId, amountPaid, paymentDate } = createPaymentDto;
+    const { studentId, feeId, amountPaid, paymentDate, paymentMethod } =
+      createPaymentDto;
 
     const student = await this.studentRepository.findOneBy({ id: +studentId });
+    
 
     if (!student) {
       throw new NotFoundException(`Student id: ${studentId} not found`);
     }
+    const fee = await this.feeRepository.findOneBy({ id: +feeId });
 
-    const fee = student.fees.find((f) => f.id === feeId);
-
-    if (!fee) throw new NotFoundException(`Fee id: ${feeId} not found`);
+    if (!fee) {
+      throw new NotFoundException(`Fee id: ${feeId} not found`);
+    }
+   
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -53,7 +57,7 @@ export class PaymentService {
       const newFee = await feeRepository
         .createQueryBuilder()
         .update(Fee)
-        .set({ amountPaid })
+        .set({ amountPaid: amountPaid + fee.amountPaid})
         .where('id = :id', { id: fee.id })
         .execute();
       console.log('newFee', { newFee });
@@ -63,6 +67,7 @@ export class PaymentService {
         paymentDate,
         fee,
         student: student,
+        paymentMethod,
       });
 
       await queryRunner.commitTransaction();

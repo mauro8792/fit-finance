@@ -15,8 +15,6 @@ export class FeeService {
   constructor(
     @InjectRepository(Fee)
     private readonly feeRepository: Repository<Fee>,
-    @InjectRepository(Student)
-    private readonly studentRepository: Repository<Student>,
   ) {}
 
   create(createFeeDto: CreateFeeDto) {
@@ -24,7 +22,7 @@ export class FeeService {
   }
 
   async findAll(paginationDto: PaginationDto) {
-     const { limit = 10, offset = 0, year, month } = paginationDto;
+    const { limit = 10, offset = 0, year, month } = paginationDto;
 
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth() + 1; // Los meses van de 0 a 11, por lo que sumamos 1 para obtener el mes actual
@@ -60,10 +58,24 @@ export class FeeService {
   }
 
   async generateNextThreeMonthsFees(): Promise<void> {
-    // Obtener todos los estudiantes
-    const students = await this.studentRepository.find();
+    const students = await this.getAllStudents();
+    await this.generateFeesForStudents(students);
+  }
 
-    // Obtener la fecha del próximo mes y los dos siguientes
+  async generateNextThreeMonthsFeesForId(id: number): Promise<void> {
+    const student = await this.getStudentById(id);
+    await this.generateFeesForStudents([student]);
+  }
+
+  private async getAllStudents(): Promise<Student[]> {
+    return this.feeRepository.manager.getRepository(Student).find();
+  }
+
+  private async getStudentById(id: number): Promise<Student> {
+    return this.feeRepository.manager.getRepository(Student).findOneBy({ id });
+  }
+
+  private async generateFeesForStudents(students: Student[]): Promise<void> {
     const today = new Date();
     const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
     const nextTwoMonths = new Date(
@@ -77,28 +89,7 @@ export class FeeService {
       1,
     );
 
-    // Generar las cuotas para los próximos tres meses para cada estudiante
     for (const student of students) {
-      const existingFees = await this.feeRepository.find({
-        where: [
-          {
-            student,
-            month: nextMonth.getMonth() + 1,
-            year: nextMonth.getFullYear(),
-          },
-          {
-            student,
-            month: nextTwoMonths.getMonth() + 1,
-            year: nextTwoMonths.getFullYear(),
-          },
-          {
-            student,
-            month: nextThreeMonths.getMonth() + 1,
-            year: nextThreeMonths.getFullYear(),
-          },
-        ],
-      });
-
       const monthsToGenerate = [
         { month: nextMonth.getMonth() + 1, year: nextMonth.getFullYear() },
         {
@@ -112,14 +103,15 @@ export class FeeService {
       ];
 
       for (const monthToGenerate of monthsToGenerate) {
-        const existingFee = existingFees.find(
-          (fee) =>
-            fee.month === monthToGenerate.month &&
-            fee.year === monthToGenerate.year,
-        );
+        const existingFee = await this.feeRepository.findOne({
+          where: {
+            student,
+            month: monthToGenerate.month,
+            year: monthToGenerate.year,
+          },
+        });
 
         if (!existingFee) {
-          // Si no existe una cuota para el mes, crear una nueva cuota
           const newFee = this.feeRepository.create({
             student,
             startDate: new Date(
@@ -128,8 +120,8 @@ export class FeeService {
               1,
             ),
             endDate: new Date(monthToGenerate.year, monthToGenerate.month, 0), // Último día del mes
-            value: 0, // iria el valor de la cuota segun el deporte
-            amountPaid: 0, // Inicialmente el monto pagado es cero,
+            value: student.sport.monthlyFee,
+            amountPaid: 0,
             month: monthToGenerate.month,
             year: monthToGenerate.year,
           });
@@ -137,6 +129,11 @@ export class FeeService {
         }
       }
     }
+  }
+
+  async generateFeesForNewStudent(studentId: number): Promise<void> {
+    const student = await this.getStudentById(studentId);
+    await this.generateFeesForStudents([student]);
   }
 
   // @Cron('10 * * * * *')
