@@ -1,73 +1,286 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# 💪 Fit Finance
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Sistema de gestión de pagos para gimnasios desarrollado con NestJS, TypeScript y MySQL.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📋 Descripción
 
-## Description
+Fit Finance es una API REST para la gestión integral de un gimnasio que incluye:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- 👥 **Gestión de estudiantes**: Registro y administración de miembros
+- 💰 **Control de pagos**: Seguimiento de cuotas y estados de pago
+- 🏃‍♂️ **Deportes**: Gestión de diferentes disciplinas deportivas
+- 👑 **Roles y autenticación**: Sistema de permisos y autenticación JWT
+- 📊 **Fees**: Administración de tarifas y precios
 
-## Installation
+## 🏗️ Arquitectura
 
-```bash
-$ yarn install
-```
+El proyecto está construido con:
 
-## Running the app
+- **Backend**: NestJS + TypeScript
+- **Base de datos**: MySQL 8.0
+- **ORM**: TypeORM
+- **Autenticación**: JWT
+- **Contenedores**: Docker & Docker Compose
+
+## 🚀 Inicio Rápido
+
+### Prerrequisitos
+
+- [Node.js](https://nodejs.org/) (v16 o superior)
+- [Docker](https://www.docker.com/) y [Docker Compose](https://docs.docker.com/compose/)
+- [Git](https://git-scm.com/)
+
+### 1. Clonar el repositorio
 
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+git clone https://github.com/mauro8792/fit-finance.git
+cd fit-finance
 ```
 
-## Test
+### 2. Configurar variables de entorno
 
 ```bash
-# unit tests
-$ yarn run test
+# Copiar el archivo de ejemplo
+cp .env.example .env
 
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+# Editar las variables según tu entorno (opcional)
+# Las variables por defecto están listas para usar con Docker
 ```
 
-## Support
+### 3. Levantar la base de datos con Docker
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+# Levantar MySQL y phpMyAdmin
+docker-compose up -d
 
-## Stay in touch
+# Verificar que los servicios estén corriendo
+docker-compose ps
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### 4. Instalar dependencias
 
-## License
+```bash
+# Usar npm (recomendado)
+npm install
 
-Nest is [MIT licensed](LICENSE).
+# O usar yarn si lo prefieres
+yarn install
+```
+
+### 5. Ejecutar la aplicación
+
+```bash
+# Modo desarrollo
+npm run start:dev
+
+# O con yarn
+yarn start:dev
+```
+
+### 6. Ejecutar el seed (opcional)
+
+Para poblar la base de datos con datos iniciales:
+
+```bash
+# Ejecutar seed con el script
+npm run seed
+
+# O via HTTP (requiere autenticación)
+# GET http://localhost:3000/seed
+```
+
+¡Listo! 🎉 Tu aplicación estará corriendo en `http://localhost:3000`
+
+## 🐳 Servicios Docker
+
+| Servicio       | URL                     | Credenciales                                                      |
+| -------------- | ----------------------- | ----------------------------------------------------------------- |
+| **MySQL**      | `localhost:3306`        | User: `fitfinance`<br>Pass: `password123`<br>DB: `fit_finance_db` |
+| **phpMyAdmin** | `http://localhost:8080` | User: `fitfinance`<br>Pass: `password123`                         |
+
+## 📦 Instalación
+
+### Instalación manual (sin Docker)
+
+Si prefieres usar una base de datos MySQL local:
+
+```bash
+# Instalar dependencias
+npm install
+
+# Configurar variables de entorno
+cp .env.example .env
+# Editar .env con tus credenciales de MySQL local
+
+# Ejecutar la aplicación
+npm run start:dev
+```
+
+## 🏃‍♂️ Ejecutar la aplicación
+
+```bash
+# Desarrollo (con hot-reload)
+npm run start:dev
+
+# Desarrollo sin hot-reload
+npm run start
+
+# Producción
+npm run start:prod
+
+# Ejecutar seed de datos iniciales
+npm run seed
+```
+
+## 🧪 Testing
+
+```bash
+# Tests unitarios
+npm run test
+
+# Tests e2e
+npm run test:e2e
+
+# Cobertura de tests
+npm run test:cov
+```
+
+## 💰 Sistema de Pagos Secuenciales
+
+El sistema implementa **validación de pagos secuenciales** para asegurar que los estudiantes paguen sus cuotas en orden cronológico.
+
+### Funcionalidad
+
+✅ **Validación automática**: No se puede pagar una cuota futura si hay cuotas anteriores pendientes  
+✅ **Mensajes informativos**: El sistema indica exactamente qué cuotas están pendientes  
+✅ **Generación automática**: Cron job diario que genera nuevas cuotas para estudiantes activos  
+✅ **Consulta de pendientes**: Endpoints para verificar estado de cuotas
+
+### Endpoints de validación
+
+```bash
+# Consultar cuotas pendientes de un estudiante
+GET /fees/student/{studentId}/unpaid
+
+# Validar si se puede pagar una cuota específica
+GET /fees/student/{studentId}/validate-payment/{feeId}
+
+# Ejecutar generación manual de cuotas (solo admins)
+POST /cron/generate-fees
+```
+
+### Ejemplo de uso
+
+```json
+// Respuesta de cuotas pendientes
+{
+  "studentId": 1,
+  "unpaidFeesCount": 2,
+  "unpaidFees": [
+    {
+      "id": 1,
+      "month": 7,
+      "year": 2025,
+      "monthName": "Julio",
+      "value": 15000,
+      "amountPaid": 0,
+      "remainingAmount": 15000,
+      "startDate": "2025-07-11",
+      "endDate": "2025-08-10"
+    }
+  ]
+}
+```
+
+## 🤖 Automatización con Cron Jobs
+
+El sistema incluye un **cron job diario** que se ejecuta a las 9:00 AM para:
+
+- Verificar todos los estudiantes activos
+- Generar automáticamente nuevas cuotas si tienen menos de 2 cuotas futuras
+- Mantener continuidad en las fechas de las cuotas
+- Registrar logs de todas las operaciones
+
+## 📁 Estructura del proyecto
+
+```
+src/
+├── auth/              # Autenticación y autorización
+├── common/            # DTOs y tipos comunes
+├── fee/               # Gestión de tarifas
+├── payment/           # Procesamiento de pagos
+├── roles/             # Roles de usuario
+├── seed/              # Datos de prueba
+├── sport/             # Gestión de deportes
+├── student/           # Gestión de estudiantes
+└── users/             # Gestión de usuarios
+```
+
+## 🔧 Variables de entorno
+
+Copia `.env.example` a `.env` y configura las siguientes variables:
+
+```env
+# Base de datos
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=fit_finance_db
+DB_USERNAME=fitfinance
+DB_PASSWORD=password123
+DB_ROOT_PASSWORD=rootpassword
+
+# JWT
+JWT_SECRET=your-super-secret-jwt-key-here
+
+# Aplicación
+PORT=3000
+NODE_ENV=development
+```
+
+## 🚨 Troubleshooting
+
+### Error: Puerto 3306 ya está en uso
+
+```bash
+# Ver qué proceso usa el puerto
+netstat -ano | findstr :3306
+
+# Cambiar el puerto en docker-compose.yml o .env
+DB_PORT=3307
+```
+
+### Error: No se puede conectar a MySQL
+
+```bash
+# Verificar que Docker esté corriendo
+docker ps
+
+# Verificar logs de MySQL
+docker-compose logs mysql
+
+# Reiniciar servicios
+docker-compose restart mysql
+```
+
+### Warning de múltiples lockfiles
+
+```bash
+# Eliminar yarn.lock si usas npm
+rm yarn.lock
+
+# O eliminar package-lock.json si usas yarn
+rm package-lock.json
+```
+
+## 📚 Documentación adicional
+
+- [Configuración de Docker](./DOCKER.md)
+- [Diagrama de base de datos](./der.txt)
+
+## 🤝 Contribuir
+
+1. Fork del proyecto
+2. Crear una rama feature (`git checkout -b feature/AmazingFeature`)
+3. Commit de los cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abrir un Pull Request

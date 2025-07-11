@@ -3,12 +3,14 @@ import { SportName } from 'src/common/types/sport.enum';
 import { Fee } from 'src/fee/entities/fee.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
 import { Sport } from 'src/sport/entities/sport.entity';
+import { User } from 'src/auth/entities/user.entity';
 import {
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -55,4 +57,8 @@ export class Student {
   @ManyToOne(() => Sport, (sport) => sport.students, {eager:true})
   @JoinColumn({ name: 'sportId' })
   sport: Sport;
+
+  @OneToOne(() => User, { eager: true })
+  @JoinColumn({ name: 'userId' })
+  user: User;
 }

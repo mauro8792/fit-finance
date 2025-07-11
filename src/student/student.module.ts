@@ -12,5 +12,6 @@ import { FeeModule } from 'src/fee/fee.module';
   controllers: [StudentController],
   providers: [StudentService],
   imports: [TypeOrmModule.forFeature([Student, Fee, Payment, Sport]), FeeModule],
+  exports: [StudentService],
 })
 export class StudentModule {}

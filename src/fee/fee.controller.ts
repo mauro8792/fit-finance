@@ -1,4 +1,3 @@
-  
 import {
   Controller,
   Get,
@@ -28,6 +27,34 @@ export class FeeController {
     return this.feeService.findAll(paginationDto);
   }
 
+  @Get('student/:studentId/unpaid')
+  async getUnpaidFeesByStudent(@Param('studentId') studentId: string) {
+    const unpaidFees = await this.feeService.getUnpaidFeesByStudent(+studentId);
+    return {
+      studentId: +studentId,
+      unpaidFeesCount: unpaidFees.length,
+      unpaidFees: unpaidFees.map(fee => ({
+        id: fee.id,
+        month: fee.month,
+        year: fee.year,
+        monthName: this.getMonthName(fee.month),
+        value: fee.value,
+        amountPaid: fee.amountPaid,
+        remainingAmount: fee.value - fee.amountPaid,
+        startDate: fee.startDate,
+        endDate: fee.endDate
+      }))
+    };
+  }
+
+  @Get('student/:studentId/validate-payment/:feeId')
+  async validatePayment(
+    @Param('studentId') studentId: string,
+    @Param('feeId') feeId: string
+  ) {
+    return await this.feeService.validateSequentialPayment(+studentId, +feeId);
+  }
+
   @Get(':term')
   findOne(@Param('term') term: string) {
     return this.feeService.findOne(term);
@@ -36,6 +63,14 @@ export class FeeController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateFeeDto: UpdateFeeDto) {
     return this.feeService.update(+id, updateFeeDto);
+  }
+
+  private getMonthName(month: number): string {
+    const months = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    return months[month - 1];
   }
 
   @Delete(':id')

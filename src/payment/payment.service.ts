@@ -13,6 +13,7 @@ import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { Payment } from './entities/payment.entity';
 import { Student } from 'src/student/entities/student.entity';
 import { Fee } from 'src/fee/entities/fee.entity';
+import { FeeService } from 'src/fee/fee.service';
 import { ERROR_DB } from 'src/constants';
 
 @Injectable()
@@ -27,6 +28,8 @@ export class PaymentService {
     @InjectRepository(Fee)
     private readonly feeRepository: Repository<Fee>,
 
+    private readonly feeService: FeeService,
+
     private readonly dataSource: DataSource,
   ) {}
 
@@ -36,16 +39,42 @@ export class PaymentService {
 
     const student = await this.studentRepository.findOneBy({ id: +studentId });
     
-
     if (!student) {
       throw new NotFoundException(`Student id: ${studentId} not found`);
     }
+    
     const fee = await this.feeRepository.findOneBy({ id: +feeId });
 
     if (!fee) {
       throw new NotFoundException(`Fee id: ${feeId} not found`);
     }
-   
+
+    // Validar que el pago se realice en orden secuencial
+    const validation = await this.feeService.validateSequentialPayment(+studentId, +feeId);
+    
+    if (!validation.isValid) {
+      const errorMessage = validation.message;
+      
+      if (validation.unpaidFees && validation.unpaidFees.length > 0) {
+        const unpaidFeesInfo = validation.unpaidFees.map(unpaidFee => 
+          `${this.getMonthName(unpaidFee.month)} ${unpaidFee.year} (Monto: $${unpaidFee.value - unpaidFee.amountPaid})`
+        ).join(', ');
+        
+        throw new BadRequestException(
+          `${errorMessage}. Cuotas pendientes: ${unpaidFeesInfo}`
+        );
+      }
+      
+      throw new BadRequestException(errorMessage);
+    }
+
+    // Validar que el monto no exceda lo que falta pagar
+    const remainingAmount = fee.value - fee.amountPaid;
+    if (amountPaid > remainingAmount) {
+      throw new BadRequestException(
+        `El monto a pagar ($${amountPaid}) excede el saldo pendiente ($${remainingAmount})`
+      );
+    }
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -66,7 +95,7 @@ export class PaymentService {
         amountPaid,
         paymentDate,
         fee,
-        student: student,
+        student: { id: student.id } as Student,
         paymentMethod,
       });
 
@@ -94,6 +123,14 @@ export class PaymentService {
 
   remove(id: number) {
     return `This action removes a #${id} payment`;
+  }
+
+  private getMonthName(month: number): string {
+    const months = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    return months[month - 1];
   }
 
   private handleDBExceptions(error: any) {

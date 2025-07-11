@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: fit-finance-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-fit_finance_db}
+      MYSQL_USER: ${DB_USERNAME:-fitfinance}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-password123}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - fit-finance-network
+    command: --default-authentication-plugin=mysql_native_password
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: fit-finance-phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: ${DB_USERNAME:-fitfinance}
+      PMA_PASSWORD: ${DB_PASSWORD:-password123}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - fit-finance-network
+
+volumes:
+  mysql_data:
+
+networks:
+  fit-finance-network:
+    driver: bridge

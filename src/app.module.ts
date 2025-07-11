@@ -14,6 +14,7 @@ import { StudentModule } from './student/student.module';
 import { FeeModule } from './fee/fee.module';
 import { PaymentModule } from './payment/payment.module';
 import { SportModule } from './sport/sport.module';
+import { CronModule } from './cron/cron.module';
 
 @Module({
   imports: [
@@ -47,6 +48,8 @@ import { SportModule } from './sport/sport.module';
     PaymentModule,
 
     SportModule,
+
+    CronModule,
   ],
   controllers: [AppController],
   providers: [AppService],

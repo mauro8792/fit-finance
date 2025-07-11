@@ -157,43 +157,50 @@ export class StudentService {
   }
 
   async generateFeesForNewStudent(studentId: number): Promise<void> {
-    const student = await this.studentRepository.findOneBy({ id: studentId });
+    const student = await this.studentRepository.findOne({
+      where: { id: studentId },
+      relations: ['sport']
+    });
 
     if (!student) {
       throw new NotFoundException(`Student not found with id: ${studentId}`);
     }
 
     const today = new Date();
-    const monthsToGenerate = [
-      { month: today.getMonth() + 1, year: today.getFullYear() },
-      { month: today.getMonth() + 2, year: today.getFullYear() },
-      { month: today.getMonth() + 3, year: today.getFullYear() },
-    ];
+    
+    // Generar 3 cuotas mensuales a partir de hoy
+    for (let i = 0; i < 3; i++) {
+      const startDate = new Date(today);
+      startDate.setMonth(today.getMonth() + i);
+      
+      const endDate = new Date(startDate);
+      endDate.setMonth(endDate.getMonth() + 1);
+      endDate.setDate(endDate.getDate() - 1); // Un día antes del próximo mes
 
-    for (const monthToGenerate of monthsToGenerate) {
+      const month = startDate.getMonth() + 1; // JavaScript months are 0-indexed
+      const year = startDate.getFullYear();
+
       const existingFee = await this.feeRepository.findOne({
         where: {
-          student,
-          month: monthToGenerate.month,
-          year: monthToGenerate.year,
+          student: { id: student.id },
+          month: month,
+          year: year,
         },
       });
 
       if (!existingFee) {
         const newFee = this.feeRepository.create({
-          student,
-          startDate: new Date(
-            monthToGenerate.year,
-            monthToGenerate.month - 1,
-            1,
-          ),
-          endDate: new Date(monthToGenerate.year, monthToGenerate.month, 0), // Último día del mes
+          student: { id: student.id } as Student,
+          startDate: startDate,
+          endDate: endDate,
           value: student.sport.monthlyFee,
           amountPaid: 0,
-          month: monthToGenerate.month,
-          year: monthToGenerate.year,
+          month: month,
+          year: year,
         });
         await this.feeRepository.save(newFee);
+        
+        this.logger.log(`Fee generated for student ${student.id}: ${startDate.toDateString()} - ${endDate.toDateString()}`);
       }
     }
   }

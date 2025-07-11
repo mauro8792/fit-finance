@@ -1,26 +1,61 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from 'src/roles/entities/rol.entity';
+import { User } from 'src/auth/entities/user.entity';
+import { Sport } from 'src/sport/entities/sport.entity';
+import { Student } from 'src/student/entities/student.entity';
+import { StudentService } from 'src/student/student.service';
 import { Repository } from 'typeorm';
 import { initialData } from './data/seed-data';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class SeedService {
   constructor(
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
+    
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    
+    @InjectRepository(Sport)
+    private readonly sportRepository: Repository<Sport>,
+    
+    @InjectRepository(Student)
+    private readonly studentRepository: Repository<Student>,
+    
+    private readonly studentService: StudentService,
   ) {}
 
   async runSeed() {
     await this.deleteTables();
 
-    await this.insertRoles();
-    return `This action returns all seed`;
+    const roles = await this.insertRoles();
+    await this.insertUsers(roles);
+    const sports = await this.insertSports();
+    await this.insertStudentsWithUsers(sports, roles);
+    
+    return {
+      message: 'Seed executed successfully!',
+      rolesCreated: initialData.roles.length,
+      usersCreated: initialData.users.length,
+      sportsCreated: initialData.sports.length,
+      studentsCreated: initialData.students.length,
+    };
   }
 
   private async deleteTables() {
-    const queryBuilder = this.roleRepository.createQueryBuilder();
-    await queryBuilder.delete().where({}).execute();
+    // Eliminar estudiantes primero (por las relaciones)
+    await this.studentRepository.createQueryBuilder().delete().where({}).execute();
+    
+    // Eliminar usuarios (por las relaciones)
+    await this.userRepository.createQueryBuilder().delete().where({}).execute();
+    
+    // Eliminar deportes
+    await this.sportRepository.createQueryBuilder().delete().where({}).execute();
+    
+    // Luego eliminar roles
+    await this.roleRepository.createQueryBuilder().delete().where({}).execute();
   }
 
   private async insertRoles() {
@@ -28,12 +63,110 @@ export class SeedService {
 
     const roles: Role[] = [];
 
-    seedRoles.forEach((u) => {
-      roles.push(this.roleRepository.create(u));
+    seedRoles.forEach((roleData) => {
+      roles.push(this.roleRepository.create(roleData));
     });
 
-    const dbRoles = await this.roleRepository.save(seedRoles);
+    const dbRoles = await this.roleRepository.save(roles);
 
-    return dbRoles[0];
+    return dbRoles;
+  }
+
+  private async insertUsers(roles: Role[]) {
+    const seedUsers = initialData.users;
+
+    const users: User[] = [];
+
+    for (const userData of seedUsers) {
+      // Encriptar la contraseña
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      
+      // Buscar los roles por nombre
+      const userRoles = roles.filter(role => 
+        userData.roles.includes(role.name)
+      );
+
+      const user = this.userRepository.create({
+        email: userData.email,
+        fullName: userData.fullName,
+        password: hashedPassword,
+        roles: userRoles,
+      });
+
+      users.push(user);
+    }
+
+    const dbUsers = await this.userRepository.save(users);
+    
+    return dbUsers;
+  }
+
+  private async insertSports() {
+    const seedSports = initialData.sports;
+
+    const sports: Sport[] = [];
+
+    seedSports.forEach((sportData) => {
+      sports.push(this.sportRepository.create(sportData));
+    });
+
+    const dbSports = await this.sportRepository.save(sports);
+    
+    return dbSports;
+  }
+
+  private async insertStudentsWithUsers(sports: Sport[], roles: Role[]) {
+    const seedStudents = initialData.students;
+    const userRole = roles.find(role => role.name === 'user');
+    
+    if (!userRole) {
+      throw new Error('User role not found');
+    }
+
+    const createdStudents: Student[] = [];
+
+    for (const studentData of seedStudents) {
+      // Buscar el deporte por nombre
+      const sport = sports.find(s => s.name === studentData.sportName);
+      
+      if (!sport) {
+        console.warn(`Sport ${studentData.sportName} not found for student ${studentData.firstName}`);
+        continue;
+      }
+
+      // Crear el usuario primero
+      const hashedPassword = await bcrypt.hash(studentData.password, 10);
+      
+      const user = this.userRepository.create({
+        email: studentData.email,
+        fullName: `${studentData.firstName} ${studentData.lastName}`,
+        password: hashedPassword,
+        roles: [userRole],
+      });
+
+      const savedUser = await this.userRepository.save(user);
+
+      // Crear el estudiante con el usuario relacionado
+      const student = this.studentRepository.create({
+        firstName: studentData.firstName,
+        lastName: studentData.lastName,
+        birthDate: new Date(studentData.birthDate),
+        phone: studentData.phone,
+        startDate: new Date(studentData.startDate),
+        document: studentData.document,
+        isActive: studentData.isActive,
+        sport: { id: sport.id } as Sport, // Solo pasar el ID para evitar conflictos
+        user: { id: savedUser.id } as User, // Solo pasar el ID para evitar conflictos
+      });
+
+      const savedStudent = await this.studentRepository.save(student);
+      
+      // Generar las cuotas para el estudiante
+      await this.studentService.generateFeesForNewStudent(savedStudent.id);
+      
+      createdStudents.push(savedStudent);
+    }
+    
+    return createdStudents;
   }
 }

@@ -105,7 +105,7 @@ export class FeeService {
       for (const monthToGenerate of monthsToGenerate) {
         const existingFee = await this.feeRepository.findOne({
           where: {
-            student,
+            student: { id: student.id },
             month: monthToGenerate.month,
             year: monthToGenerate.year,
           },
@@ -113,7 +113,7 @@ export class FeeService {
 
         if (!existingFee) {
           const newFee = this.feeRepository.create({
-            student,
+            student: { id: student.id } as Student,
             startDate: new Date(
               monthToGenerate.year,
               monthToGenerate.month - 1,
@@ -141,5 +141,74 @@ export class FeeService {
   async generateNextMonthFeesCron() {
     await this.generateNextThreeMonthsFees();
     this.logger.log('Called when the current second is 45');
+  }
+
+  async validateSequentialPayment(studentId: number, feeId: number): Promise<{ isValid: boolean; message?: string; unpaidFees?: Fee[] }> {
+    // Obtener la cuota que se quiere pagar
+    const targetFee = await this.feeRepository.findOne({
+      where: { id: feeId },
+      relations: ['student']
+    });
+
+    if (!targetFee) {
+      return {
+        isValid: false,
+        message: 'La cuota especificada no existe'
+      };
+    }
+
+    if (targetFee.student.id !== studentId) {
+      return {
+        isValid: false,
+        message: 'La cuota no pertenece al estudiante especificado'
+      };
+    }
+
+    // Verificar si la cuota ya está completamente pagada
+    if (targetFee.amountPaid >= targetFee.value) {
+      return {
+        isValid: false,
+        message: 'Esta cuota ya está completamente pagada'
+      };
+    }
+
+    // Obtener todas las cuotas anteriores no pagadas del estudiante
+    const unpaidPreviousFees = await this.feeRepository
+      .createQueryBuilder('fee')
+      .where('fee.studentId = :studentId', { studentId })
+      .andWhere('fee.startDate < :targetStartDate', { targetStartDate: targetFee.startDate })
+      .andWhere('fee.amountPaid < fee.value') // Cuotas no completamente pagadas
+      .orderBy('fee.startDate', 'ASC')
+      .getMany();
+
+    if (unpaidPreviousFees.length > 0) {
+      return {
+        isValid: false,
+        message: `No se puede pagar la cuota de ${this.getMonthName(targetFee.month)} ${targetFee.year} porque tienes cuotas anteriores pendientes`,
+        unpaidFees: unpaidPreviousFees
+      };
+    }
+
+    return {
+      isValid: true,
+      message: 'El pago puede proceder'
+    };
+  }
+
+  private getMonthName(month: number): string {
+    const months = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    return months[month - 1];
+  }
+
+  async getUnpaidFeesByStudent(studentId: number): Promise<Fee[]> {
+    return await this.feeRepository
+      .createQueryBuilder('fee')
+      .where('fee.studentId = :studentId', { studentId })
+      .andWhere('fee.amountPaid < fee.value')
+      .orderBy('fee.startDate', 'ASC')
+      .getMany();
   }
 }
