@@ -58,4 +58,22 @@ export class AuthController {
       user,
     };
   }
+
+  @Get('student-dashboard')
+  @Auth(ValidRoles.user)
+  getStudentDashboard(@GetUser() user: User) {
+    return this.authService.getStudentDashboard(user.id);
+  }
+
+  @Get('student-profile')
+  @Auth(ValidRoles.user)
+  getStudentProfile(@GetUser() user: User) {
+    return this.authService.getStudentProfile(user.id);
+  }
+
+  @Get('verify')
+  @Auth()
+  verifyToken(@GetUser() user: User) {
+    return this.authService.verifyToken(user);
+  }
 }

@@ -6,9 +6,11 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Role } from 'src/roles/entities/rol.entity';
+import { Student } from 'src/student/entities/student.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -28,13 +30,15 @@ export class User {
   @MinLength(8)
   fullName: string;
 
-
   @Column('bool', { default: true })
   isActive: boolean;
 
-  @ManyToMany(() => Role, {eager:true})
+  @ManyToMany(() => Role, { eager: true })
   @JoinTable()
   roles: Role[];
+
+  @OneToOne(() => Student, (student) => student.user)
+  student: Student;
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {

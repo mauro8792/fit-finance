@@ -211,4 +211,74 @@ export class FeeService {
       .orderBy('fee.startDate', 'ASC')
       .getMany();
   }
+
+  async getStudentFeesWithDetails(studentId: number) {
+    const fees = await this.feeRepository
+      .createQueryBuilder('fee')
+      .leftJoinAndSelect('fee.student', 'student')
+      .leftJoinAndSelect('student.sport', 'sport')
+      .leftJoinAndSelect('fee.payments', 'payments')
+      .where('fee.studentId = :studentId', { studentId })
+      .orderBy('fee.year', 'DESC')
+      .addOrderBy('fee.month', 'DESC')
+      .getMany();
+
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear();
+
+    const feesWithDetails = fees.map(fee => {
+      const isPaid = fee.amountPaid >= fee.value;
+      const isPartial = fee.amountPaid > 0 && fee.amountPaid < fee.value;
+      const isPending = fee.amountPaid === 0;
+      const isCurrent = fee.month === currentMonth && fee.year === currentYear;
+      const isOverdue = (fee.year < currentYear) || (fee.year === currentYear && fee.month < currentMonth);
+
+      return {
+        id: fee.id,
+        month: fee.month,
+        year: fee.year,
+        monthName: this.getMonthName(fee.month),
+        value: fee.value,
+        amountPaid: fee.amountPaid,
+        remainingAmount: Math.max(0, fee.value - fee.amountPaid),
+        startDate: fee.startDate,
+        endDate: fee.endDate,
+        status: isPaid ? 'paid' : isPartial ? 'partial' : 'pending',
+        isCurrent,
+        isOverdue: isOverdue && !isPaid,
+        payments: fee.payments?.map(payment => ({
+          id: payment.id,
+          amount: payment.amountPaid,
+          paymentDate: payment.paymentDate,
+          paymentMethod: payment.paymentMethod,
+        })) || [],
+        paymentCount: fee.payments?.length || 0,
+      };
+    });
+
+    // Estadísticas
+    const totalFees = feesWithDetails.length;
+    const paidFees = feesWithDetails.filter(fee => fee.status === 'paid').length;
+    const partialFees = feesWithDetails.filter(fee => fee.status === 'partial').length;
+    const pendingFees = feesWithDetails.filter(fee => fee.status === 'pending').length;
+    const overdueFees = feesWithDetails.filter(fee => fee.isOverdue).length;
+
+    return {
+      student: fees[0]?.student ? {
+        id: fees[0].student.id,
+        firstName: fees[0].student.firstName,
+        lastName: fees[0].student.lastName,
+        sport: fees[0].student.sport,
+      } : null,
+      summary: {
+        total: totalFees,
+        paid: paidFees,
+        partial: partialFees,
+        pending: pendingFees,
+        overdue: overdueFees,
+      },
+      fees: feesWithDetails,
+    };
+  }
 }

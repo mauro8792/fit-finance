@@ -48,11 +48,16 @@ export class FeeController {
   }
 
   @Get('student/:studentId/validate-payment/:feeId')
-  async validatePayment(
+  async validateSequentialPayment(
     @Param('studentId') studentId: string,
     @Param('feeId') feeId: string
   ) {
-    return await this.feeService.validateSequentialPayment(+studentId, +feeId);
+    return this.feeService.validateSequentialPayment(+studentId, +feeId);
+  }
+
+  @Get('my-fees/:studentId')
+  async getMyFees(@Param('studentId') studentId: string) {
+    return this.feeService.getStudentFeesWithDetails(+studentId);
   }
 
   @Get(':term')
