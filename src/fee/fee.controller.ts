@@ -7,13 +7,16 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { FeeService } from './fee.service';
 import { CreateFeeDto } from './dto/create-fee.dto';
 import { UpdateFeeDto } from './dto/update-fee.dto';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
-@Controller('fees')
+@Controller('fee')
 export class FeeController {
   constructor(private readonly feeService: FeeService) {}
 
@@ -58,6 +61,14 @@ export class FeeController {
   @Get('my-fees/:studentId')
   async getMyFees(@Param('studentId') studentId: string) {
     return this.feeService.getStudentFeesWithDetails(+studentId);
+  }
+
+  @Get('my-fees')
+  @UseGuards(AuthGuard('jwt'))
+  async getMyFeesAuthenticated(@Request() req) {
+    // Obtener el studentId del usuario autenticado
+    const userId = req.user.id;
+    return this.feeService.getStudentFeesWithDetailsByUserId(userId);
   }
 
   @Get(':term')

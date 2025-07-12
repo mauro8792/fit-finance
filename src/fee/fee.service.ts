@@ -219,8 +219,8 @@ export class FeeService {
       .leftJoinAndSelect('student.sport', 'sport')
       .leftJoinAndSelect('fee.payments', 'payments')
       .where('fee.studentId = :studentId', { studentId })
-      .orderBy('fee.year', 'DESC')
-      .addOrderBy('fee.month', 'DESC')
+      .orderBy('fee.year', 'ASC')
+      .addOrderBy('fee.month', 'ASC')
       .getMany();
 
     const currentDate = new Date();
@@ -280,5 +280,22 @@ export class FeeService {
       },
       fees: feesWithDetails,
     };
+  }
+
+  async getStudentFeesWithDetailsByUserId(userId: number) {
+    // Primero buscar el estudiante asociado al usuario
+    const student = await this.feeRepository.manager
+      .getRepository(Student)
+      .createQueryBuilder('student')
+      .leftJoinAndSelect('student.user', 'user')
+      .where('user.id = :userId', { userId })
+      .getOne();
+
+    if (!student) {
+      throw new NotFoundException('Student not found for this user');
+    }
+
+    // Usar el método existente con el studentId encontrado
+    return this.getStudentFeesWithDetails(student.id);
   }
 }
