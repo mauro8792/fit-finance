@@ -158,6 +158,17 @@ export class AuthService {
     const currentMonth = currentDate.getMonth() + 1;
     const currentYear = currentDate.getFullYear();
 
+    // Cuotas pendientes solo de meses vencidos o del mes actual
+    const currentPendingFees = student.fees.filter(fee => {
+      const feeDate = new Date(fee.year, fee.month - 1);
+      const currentMonthDate = new Date(currentYear, currentMonth - 1);
+      
+      // Solo incluir cuotas que ya vencieron o son del mes actual
+      return feeDate <= currentMonthDate && fee.amountPaid < fee.value;
+    });
+
+    const currentPending = currentPendingFees.reduce((sum, fee) => sum + (fee.value - fee.amountPaid), 0);
+
     // Cuotas del mes actual
     const currentMonthFees = student.fees.filter(
       fee => fee.month === currentMonth && fee.year === currentYear
@@ -200,6 +211,9 @@ export class AuthService {
         monthlyFee: student.sport.monthlyFee,
       },
       feesSummary: {
+        totalPaid: student.fees.reduce((sum, fee) => sum + fee.amountPaid, 0),
+        totalPending: student.fees.reduce((sum, fee) => sum + (fee.value - fee.amountPaid), 0),
+        currentPending: currentPending, // Solo cuotas vencidas o del mes actual
         currentMonthFees: currentMonthFees.map(fee => ({
           id: fee.id,
           month: fee.month,
