@@ -146,7 +146,7 @@ export class AuthService {
     const studentRepository = this.dataSource.getRepository(Student);
     const student = await studentRepository.findOne({
       where: { user: { id: userId } },
-      relations: ['sport', 'user', 'fees'],
+      relations: ['sport', 'user', 'fees', 'fees.payments'],
     });
 
     if (!student) {
@@ -168,18 +168,20 @@ export class AuthService {
       fee => fee.amountPaid < fee.value
     );
 
-    // Últimos 3 meses de cuotas
+    // Cuotas desde el mes actual hacia adelante (incluyendo algunas pasadas)
     const recentFees = student.fees
       .filter(fee => {
         const feeDate = new Date(fee.year, fee.month - 1);
-        const threeMonthsAgo = new Date(currentYear, currentMonth - 4);
-        return feeDate >= threeMonthsAgo;
+        const twoMonthsAgo = new Date(currentYear, currentMonth - 3); // 2 meses atrás
+        const sixMonthsAhead = new Date(currentYear, currentMonth + 5); // 6 meses adelante
+        return feeDate >= twoMonthsAgo && feeDate <= sixMonthsAhead;
       })
       .sort((a, b) => {
-        if (a.year !== b.year) return b.year - a.year;
-        return b.month - a.month;
+        // Ordenar por año y mes ascendente (cronológico: pasado → presente → futuro)
+        if (a.year !== b.year) return a.year - b.year;
+        return a.month - b.month;
       })
-      .slice(0, 3);
+      .slice(0, 6); // Mostrar hasta 6 cuotas
 
     return {
       student: {
@@ -202,22 +204,32 @@ export class AuthService {
           id: fee.id,
           month: fee.month,
           year: fee.year,
-          value: fee.value,
+          amount: fee.value, // Cambiar 'value' por 'amount' para el frontend
           amountPaid: fee.amountPaid,
           startDate: fee.startDate,
           endDate: fee.endDate,
           isPaid: fee.amountPaid >= fee.value,
+          paymentStatus: fee.amountPaid >= fee.value ? 'paid' : 
+                        fee.amountPaid > 0 ? 'partial' : 'pending'
         })),
         pendingFeesCount: pendingFees.length,
         recentFees: recentFees.map(fee => ({
           id: fee.id,
           month: fee.month,
           year: fee.year,
-          value: fee.value,
+          monthName: this.getMonthName(fee.month),
+          amount: fee.value,
           amountPaid: fee.amountPaid,
+          remainingAmount: fee.value - fee.amountPaid,
           startDate: fee.startDate,
           endDate: fee.endDate,
+          dueDate: fee.endDate, // Fecha de vencimiento
           isPaid: fee.amountPaid >= fee.value,
+          paymentStatus: fee.amountPaid >= fee.value ? 'paid' : 
+                        fee.amountPaid > 0 ? 'partial' : 'pending',
+          // Obtener fecha del último pago si existe
+          lastPaymentDate: fee.payments && fee.payments.length > 0 ? 
+            fee.payments.sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())[0].paymentDate : null
         })),
       }
     };
@@ -301,5 +313,13 @@ export class AuthService {
     throw new InternalServerErrorException(
       'Unexpected error, check server logs',
     );
+  }
+
+  private getMonthName(month: number): string {
+    const months = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    return months[month - 1] || `Mes ${month}`;
   }
 }
