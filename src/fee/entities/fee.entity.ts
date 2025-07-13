@@ -20,6 +20,13 @@ export class Fee {
   @Column({ default: 0 }) // Valor predeterminado para el monto pagado (0 al inicio)
   amountPaid: number;
 
+  @Column({ 
+    type: 'enum', 
+    enum: ['pending', 'partial', 'completed'], 
+    default: 'pending' 
+  })
+  status: 'pending' | 'partial' | 'completed';
+
   @Column()
   month: number;
 

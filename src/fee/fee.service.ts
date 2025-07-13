@@ -312,15 +312,25 @@ export class FeeService {
       throw new NotFoundException(`Fee with id ${feeId} not found`);
     }
 
-    // Calcular el total pagado incluyendo este nuevo pago
-    const totalPaid = fee.payments.reduce((sum, payment) => sum + payment.amountPaid, 0) + amountPaid;
+    // Calcular el total pagado solo de los pagos existentes
+    // El nuevo pago ya debe estar guardado en la base de datos
+    const totalPaid = fee.payments.reduce((sum, payment) => sum + payment.amountPaid, 0);
 
-    // Actualizar la cuota con el nuevo monto pagado
+    // Determinar el status basado en el monto pagado
+    let status: 'pending' | 'partial' | 'completed' = 'pending';
+    if (totalPaid >= fee.value) {
+      status = 'completed';
+    } else if (totalPaid > 0) {
+      status = 'partial';
+    }
+
+    // Actualizar la cuota con el monto total pagado y el status
     await this.feeRepository.update(feeId, {
-      amountPaid: totalPaid
+      amountPaid: totalPaid,
+      status: status
     });
 
-    this.logger.log(`Fee ${feeId} updated: amount paid ${totalPaid}`);
+    this.logger.log(`Fee ${feeId} updated: amount paid ${totalPaid} (from ${fee.payments.length} payments), status: ${status}`);
     return fee;
   }
 }
