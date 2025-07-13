@@ -25,6 +25,18 @@ export class CreatePreferenceDto {
   @IsOptional()
   @IsString()
   payerPhone?: string;
+
+  @IsOptional()
+  @IsString()
+  preferredPaymentMethod?: string;
+
+  @IsOptional()
+  bankTransferData?: {
+    alias?: string;
+    cbu?: string;
+    accountHolder?: string;
+    bankName?: string;
+  };
 }
 
 export class ProcessPaymentDto {

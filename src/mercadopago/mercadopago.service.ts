@@ -81,14 +81,16 @@ export class MercadoPagoService {
           failure: `${this.configService.get('FRONTEND_URL')}/student/payment-failure`,
           pending: `${this.configService.get('FRONTEND_URL')}/student/payment-pending`
         },
-        payment_methods: {
-          excluded_payment_methods: [],
-          excluded_payment_types: [],
-          installments: 12 // Permitir hasta 12 cuotas
-        },
+        payment_methods: this.getPaymentMethodsConfig(createPreferenceDto.preferredPaymentMethod),
         notification_url: `${this.configService.get('BACKEND_URL')}/mercadopago/webhook`,
         statement_descriptor: 'GYM_FIT_FINANCE',
         external_reference: createPreferenceDto.feeId.toString(),
+        // Agregar metadata para transferencias bancarias
+        ...(createPreferenceDto.bankTransferData && {
+          metadata: {
+            bank_transfer_data: createPreferenceDto.bankTransferData
+          }
+        })
       };
 
       this.logger.log(`Preference data: ${JSON.stringify(preferenceData, null, 2)}`);
@@ -293,6 +295,64 @@ export class MercadoPagoService {
     } catch (error) {
       this.logger.error(`Error getting payment methods: ${error.message}`, error.stack);
       throw new BadRequestException('Error al obtener métodos de pago');
+    }
+  }
+
+  /**
+   * Configurar métodos de pago según la preferencia del usuario
+   */
+  private getPaymentMethodsConfig(preferredMethod?: string) {
+    const baseConfig = {
+      excluded_payment_methods: [],
+      excluded_payment_types: [],
+      installments: 12 // Permitir hasta 12 cuotas
+    };
+
+    // Si no hay preferencia, mostrar todos los métodos
+    if (!preferredMethod) {
+      return baseConfig;
+    }
+
+    // Configurar según el método preferido
+    switch (preferredMethod) {
+      case 'credit_card':
+        return {
+          ...baseConfig,
+          excluded_payment_types: [
+            { id: 'debit_card' },
+            { id: 'prepaid_card' },
+            { id: 'bank_transfer' },
+            { id: 'ticket' },
+            { id: 'atm' }
+          ]
+        };
+
+      case 'debit_card':
+        return {
+          ...baseConfig,
+          excluded_payment_types: [
+            { id: 'credit_card' },
+            { id: 'prepaid_card' },
+            { id: 'bank_transfer' },
+            { id: 'ticket' },
+            { id: 'atm' }
+          ]
+        };
+
+      case 'bank_transfer':
+        return {
+          ...baseConfig,
+          excluded_payment_types: [
+            { id: 'credit_card' },
+            { id: 'debit_card' },
+            { id: 'prepaid_card' },
+            { id: 'ticket' },
+            { id: 'atm' }
+          ]
+        };
+
+      default:
+        return baseConfig;
     }
   }
 }
