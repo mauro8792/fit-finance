@@ -14,5 +14,6 @@ import { FeeModule } from 'src/fee/fee.module';
     TypeOrmModule.forFeature([Student, Payment, Fee]),
     FeeModule
   ],
+  exports: [PaymentService]
 })
 export class PaymentModule {}

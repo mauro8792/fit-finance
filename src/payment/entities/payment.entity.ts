@@ -18,6 +18,15 @@ export class Payment {
   @Column('')
   paymentMethod: string;
 
+  @Column({ default: 'pending' })
+  status: string;
+
+  @Column({ nullable: true })
+  externalId: string;
+
+  @Column('json', { nullable: true })
+  metadata: any;
+
   @ManyToOne(() => Student, (student) => student.payments, { eager: false })
   @JoinColumn({ name: 'studentId' })
   student: Student;

@@ -15,6 +15,8 @@ import { FeeModule } from './fee/fee.module';
 import { PaymentModule } from './payment/payment.module';
 import { SportModule } from './sport/sport.module';
 import { CronModule } from './cron/cron.module';
+import { MercadoPagoModule } from './mercadopago/mercadopago.module';
+import { TestModule } from './test/test.module';
 
 @Module({
   imports: [
@@ -50,6 +52,10 @@ import { CronModule } from './cron/cron.module';
     SportModule,
 
     CronModule,
+
+    MercadoPagoModule,
+
+    TestModule,
   ],
   controllers: [AppController],
   providers: [AppService],

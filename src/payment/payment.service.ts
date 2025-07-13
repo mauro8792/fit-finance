@@ -125,6 +125,67 @@ export class PaymentService {
     return `This action removes a #${id} payment`;
   }
 
+  /**
+   * Crear o actualizar pago desde MercadoPago
+   */
+  async createOrUpdatePayment(paymentData: {
+    feeId: string;
+    amount: number;
+    method: string;
+    status: string;
+    externalId: string;
+    metadata?: any;
+  }) {
+    try {
+      this.logger.log(`Processing payment for feeId: ${paymentData.feeId}, externalId: ${paymentData.externalId}`);
+
+      // Buscar si ya existe un pago con este externalId
+      let payment = await this.paymentRepository.findOne({
+        where: { externalId: paymentData.externalId }
+      });
+
+      const fee = await this.feeRepository.findOneBy({ id: +paymentData.feeId });
+      if (!fee) {
+        throw new NotFoundException(`Fee id: ${paymentData.feeId} not found`);
+      }
+
+      if (payment) {
+        // Actualizar pago existente
+        payment.status = paymentData.status;
+        payment.metadata = paymentData.metadata;
+        payment = await this.paymentRepository.save(payment);
+        this.logger.log(`Payment updated: ${payment.id} for fee: ${paymentData.feeId}`);
+      } else {
+        // Crear nuevo pago
+        payment = this.paymentRepository.create({
+          fee: fee,
+          amountPaid: paymentData.amount,
+          paymentMethod: paymentData.method,
+          status: paymentData.status,
+          externalId: paymentData.externalId,
+          metadata: paymentData.metadata,
+          paymentDate: new Date(),
+        });
+
+        payment = await this.paymentRepository.save(payment);
+        this.logger.log(`New payment created: ${payment.id} for fee: ${paymentData.feeId}`);
+      }
+
+      // Si el pago fue aprobado, actualizar el estado de la cuota
+      if (paymentData.status === 'completed') {
+        this.logger.log(`Payment approved, updating fee status for fee: ${paymentData.feeId}`);
+        await this.feeService.updateFeePaymentStatus(fee.id, paymentData.amount);
+        this.logger.log(`Fee status updated successfully for fee: ${paymentData.feeId}`);
+      }
+
+      return payment;
+
+    } catch (error) {
+      this.logger.error(`Error creating/updating payment: ${error.message}`, error.stack);
+      throw error;
+    }
+  }
+
   private getMonthName(month: number): string {
     const months = [
       'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',

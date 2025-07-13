@@ -298,4 +298,29 @@ export class FeeService {
     // Usar el método existente con el studentId encontrado
     return this.getStudentFeesWithDetails(student.id);
   }
+
+  /**
+   * Actualizar el estado de pago de una cuota
+   */
+  async updateFeePaymentStatus(feeId: number, amountPaid: number) {
+    const fee = await this.feeRepository.findOne({
+      where: { id: feeId },
+      relations: ['payments']
+    });
+
+    if (!fee) {
+      throw new NotFoundException(`Fee with id ${feeId} not found`);
+    }
+
+    // Calcular el total pagado incluyendo este nuevo pago
+    const totalPaid = fee.payments.reduce((sum, payment) => sum + payment.amountPaid, 0) + amountPaid;
+
+    // Actualizar la cuota con el nuevo monto pagado
+    await this.feeRepository.update(feeId, {
+      amountPaid: totalPaid
+    });
+
+    this.logger.log(`Fee ${feeId} updated: amount paid ${totalPaid}`);
+    return fee;
+  }
 }
