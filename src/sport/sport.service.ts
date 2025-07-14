@@ -11,7 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Sport } from './entities/sport.entity';
 import { Repository } from 'typeorm';
 import { ERROR_DB } from '../constants';
-import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { PaginationDto } from '../common/dtos/pagination.dto';
 
 @Injectable()
 export class SportService {

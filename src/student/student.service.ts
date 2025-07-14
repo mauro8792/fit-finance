@@ -9,12 +9,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 
 import { UpdateStudentDto, CreateStudentDto } from './dto';
-import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { PaginationDto } from '../common/dtos/pagination.dto';
 import { Student } from './entities/student.entity';
 import { ERROR_DB } from '../constants';
-import { Sport } from 'src/sport/entities/sport.entity';
-import { FeeService } from 'src/fee/fee.service';
-import { Fee } from 'src/fee/entities/fee.entity';
+import { Sport } from '../sport/entities/sport.entity';
+import { FeeService } from '../fee/fee.service';
+import { Fee } from '../fee/entities/fee.entity';
 
 @Injectable()
 export class StudentService {

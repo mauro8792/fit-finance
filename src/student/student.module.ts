@@ -3,10 +3,10 @@ import { StudentService } from './student.service';
 import { StudentController } from './student.controller';
 import { Student } from './entities/student.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Fee } from 'src/fee/entities/fee.entity';
-import { Payment } from 'src/payment/entities/payment.entity';
-import { Sport } from 'src/sport/entities/sport.entity';
-import { FeeModule } from 'src/fee/fee.module';
+import { Fee } from '../fee/entities/fee.entity';
+import { Payment } from '../payment/entities/payment.entity';
+import { Sport } from '../sport/entities/sport.entity';
+import { FeeModule } from '../fee/fee.module';
 
 @Module({
   controllers: [StudentController],

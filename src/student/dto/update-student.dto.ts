@@ -7,8 +7,8 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { SportName } from 'src/common/types/sport.enum';
-import { Sport } from 'src/sport/entities/sport.entity';
+import { SportName } from '../../common/types/sport.enum';
+import { Sport } from '../../sport/entities/sport.entity';
 
 export class UpdateStudentDto {
   @IsOptional()

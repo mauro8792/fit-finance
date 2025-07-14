@@ -1,9 +1,9 @@
 import { MaxLength, MinLength } from 'class-validator';
-import { SportName } from 'src/common/types/sport.enum';
-import { Fee } from 'src/fee/entities/fee.entity';
-import { Payment } from 'src/payment/entities/payment.entity';
-import { Sport } from 'src/sport/entities/sport.entity';
-import { User } from 'src/auth/entities/user.entity';
+import { SportName } from '../../common/types/sport.enum';
+import { Fee } from '../../fee/entities/fee.entity';
+import { Payment } from '../../payment/entities/payment.entity';
+import { Sport } from '../../sport/entities/sport.entity';
+import { User } from '../../auth/entities/user.entity';
 import {
   Column,
   Entity,
