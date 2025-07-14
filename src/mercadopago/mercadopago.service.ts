@@ -302,57 +302,21 @@ export class MercadoPagoService {
    * Configurar métodos de pago según la preferencia del usuario
    */
   private getPaymentMethodsConfig(preferredMethod?: string) {
+    // Configuración para SOLO permitir transferencias bancarias
     const baseConfig = {
       excluded_payment_methods: [],
-      excluded_payment_types: [],
-      installments: 12 // Permitir hasta 12 cuotas
+      excluded_payment_types: [
+        { id: 'credit_card' },     // ❌ Sin tarjetas de crédito
+        { id: 'debit_card' },      // ❌ Sin tarjetas de débito  
+        { id: 'prepaid_card' },    // ❌ Sin tarjetas prepagas
+        { id: 'ticket' },          // ❌ Sin tickets de pago
+        { id: 'atm' },             // ❌ Sin cajeros automáticos
+        { id: 'account_money' }    // ❌ Sin dinero en cuenta MP
+      ],
+      installments: 1 // Solo pagos únicos para transferencias
     };
 
-    // Si no hay preferencia, mostrar todos los métodos
-    if (!preferredMethod) {
-      return baseConfig;
-    }
-
-    // Configurar según el método preferido
-    switch (preferredMethod) {
-      case 'credit_card':
-        return {
-          ...baseConfig,
-          excluded_payment_types: [
-            { id: 'debit_card' },
-            { id: 'prepaid_card' },
-            { id: 'bank_transfer' },
-            { id: 'ticket' },
-            { id: 'atm' }
-          ]
-        };
-
-      case 'debit_card':
-        return {
-          ...baseConfig,
-          excluded_payment_types: [
-            { id: 'credit_card' },
-            { id: 'prepaid_card' },
-            { id: 'bank_transfer' },
-            { id: 'ticket' },
-            { id: 'atm' }
-          ]
-        };
-
-      case 'bank_transfer':
-        return {
-          ...baseConfig,
-          excluded_payment_types: [
-            { id: 'credit_card' },
-            { id: 'debit_card' },
-            { id: 'prepaid_card' },
-            { id: 'ticket' },
-            { id: 'atm' }
-          ]
-        };
-
-      default:
-        return baseConfig;
-    }
+    // Solo permitir transferencias bancarias
+    return baseConfig;
   }
 }
