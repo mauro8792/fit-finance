@@ -310,13 +310,13 @@ export class MercadoPagoService {
         { id: 'debit_card' },      // ❌ Sin tarjetas de débito  
         { id: 'prepaid_card' },    // ❌ Sin tarjetas prepagas
         { id: 'ticket' },          // ❌ Sin tickets de pago
-        { id: 'atm' },             // ❌ Sin cajeros automáticos
-        { id: 'account_money' }    // ❌ Sin dinero en cuenta MP
+        { id: 'atm' }              // ❌ Sin cajeros automáticos
+        // ⚠️ NO excluimos 'account_money' porque MercadoPago no lo permite
       ],
       installments: 1 // Solo pagos únicos para transferencias
     };
 
-    // Solo permitir transferencias bancarias
+    // Solo permitir transferencias bancarias (y dinero en cuenta MP)
     return baseConfig;
   }
 }
