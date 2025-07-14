@@ -1,43 +1,38 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: fit-finance-mysql
+  postgres:
+    image: postgres:15-alpine
+    container_name: fit-finance-postgres
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
-      MYSQL_DATABASE: ${DB_NAME:-fit_finance_db}
-      MYSQL_USER: ${DB_USERNAME:-fitfinance}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-password123}
+      POSTGRES_DB: ${DB_NAME:-fit_finance_db}
+      POSTGRES_USER: ${DB_USERNAME:-fitfinance}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password123}
     ports:
-      - "${DB_PORT:-3306}:3306"
+      - "${DB_PORT:-5432}:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
       - ./init-scripts:/docker-entrypoint-initdb.d
     networks:
       - fit-finance-network
-    command: --default-authentication-plugin=mysql_native_password
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: fit-finance-phpmyadmin
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: fit-finance-pgadmin
     restart: always
     environment:
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-      PMA_USER: ${DB_USERNAME:-fitfinance}
-      PMA_PASSWORD: ${DB_PASSWORD:-password123}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      PGADMIN_DEFAULT_EMAIL: admin@fitfinance.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
     ports:
       - "8080:80"
     depends_on:
-      - mysql
+      - postgres
     networks:
       - fit-finance-network
 
 volumes:
-  mysql_data:
+  postgres_data:
 
 networks:
   fit-finance-network:
