@@ -1,5 +1,5 @@
-import { Fee } from "src/fee/entities/fee.entity";
-import { Student } from "src/student/entities/student.entity";
+import { Fee } from "../../fee/entities/fee.entity";
+import { Student } from "../../student/entities/student.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('sports')

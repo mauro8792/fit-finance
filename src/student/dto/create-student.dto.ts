@@ -1,5 +1,5 @@
 import { IsBoolean, IsDate, IsNumber, IsOptional, IsString, Matches, MaxLength, MinLength } from "class-validator";
-import { Sport } from "src/sport/entities/sport.entity";
+import { Sport } from "../../sport/entities/sport.entity";
 
 export class CreateStudentDto {
   @IsString()
