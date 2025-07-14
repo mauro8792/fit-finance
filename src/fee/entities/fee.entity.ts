@@ -1,6 +1,6 @@
-import { Payment } from "src/payment/entities/payment.entity";
-import { Sport } from "src/sport/entities/sport.entity";
-import { Student } from "src/student/entities/student.entity";
+import { Payment } from "../../payment/entities/payment.entity";
+import { Sport } from "../../sport/entities/sport.entity";
+import { Student } from "../../student/entities/student.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'fees' })

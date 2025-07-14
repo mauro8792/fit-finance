@@ -11,9 +11,9 @@ import { DataSource, Repository } from 'typeorm';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { Payment } from './entities/payment.entity';
-import { Student } from 'src/student/entities/student.entity';
-import { Fee } from 'src/fee/entities/fee.entity';
-import { FeeService } from 'src/fee/fee.service';
+import { Student } from '../student/entities/student.entity';
+import { Fee } from '../fee/entities/fee.entity';
+import { FeeService } from '../fee/fee.service';
 import { ERROR_DB } from '../constants';
 
 @Injectable()
@@ -203,3 +203,4 @@ export class PaymentService {
     );
   }
 }
+

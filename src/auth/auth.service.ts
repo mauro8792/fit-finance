@@ -15,8 +15,8 @@ import { ERROR_DB } from '../constants';
 import { JwtPayload } from './interfaces';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto, LoginUserDto } from './dto';
-import { Role } from 'src/roles/entities/rol.entity';
-import { Student } from 'src/student/entities/student.entity';
+import { Role } from '../roles/entities/rol.entity';
+import { Student } from '../student/entities/student.entity';
 
 @Injectable()
 export class AuthService {
@@ -337,3 +337,4 @@ export class AuthService {
     return months[month - 1] || `Mes ${month}`;
   }
 }
+

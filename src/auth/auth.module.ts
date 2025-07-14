@@ -7,11 +7,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { RolesModule } from 'src/roles/roles.module';
+import { RolesModule } from '../roles/roles.module';
 
 import { User } from './entities/user.entity';
-import { Student } from 'src/student/entities/student.entity';
-import { Role } from 'src/roles/entities/rol.entity';
+import { Student } from '../student/entities/student.entity';
+import { Role } from '../roles/entities/rol.entity';
 
 @Module({
   controllers: [AuthController],
@@ -37,3 +37,4 @@ import { Role } from 'src/roles/entities/rol.entity';
   exports: [TypeOrmModule, JwtStrategy, PassportModule, JwtModule],
 })
 export class AuthModule {}
+

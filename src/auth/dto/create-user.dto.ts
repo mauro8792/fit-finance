@@ -8,7 +8,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Sport } from 'src/sport/entities/sport.entity';
+import { Sport } from '../../sport/entities/sport.entity';
 export class CreateUserDto {
   @ApiProperty({
     example: 'ejemplo@gmail.com',
@@ -51,3 +51,4 @@ export class CreateUserDto {
   @IsString()
   sport: Sport;
 }
+

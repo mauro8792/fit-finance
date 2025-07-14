@@ -14,7 +14,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { FeeService } from './fee.service';
 import { CreateFeeDto } from './dto/create-fee.dto';
 import { UpdateFeeDto } from './dto/update-fee.dto';
-import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { PaginationDto } from '../common/dtos/pagination.dto';
 
 @Controller('fee')
 export class FeeController {
@@ -94,3 +94,4 @@ export class FeeController {
     return this.feeService.remove(+id);
   }
 }
+

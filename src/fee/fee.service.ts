@@ -5,8 +5,8 @@ import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Fee } from './entities/fee.entity';
 import { Repository } from 'typeorm';
-import { Student } from 'src/student/entities/student.entity';
-import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { Student } from '../student/entities/student.entity';
+import { PaginationDto } from '../common/dtos/pagination.dto';
 
 @Injectable()
 export class FeeService {
@@ -334,3 +334,4 @@ export class FeeService {
     return fee;
   }
 }
+

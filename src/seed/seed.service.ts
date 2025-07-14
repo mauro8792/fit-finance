@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Role } from 'src/roles/entities/rol.entity';
-import { User } from 'src/auth/entities/user.entity';
-import { Sport } from 'src/sport/entities/sport.entity';
-import { Student } from 'src/student/entities/student.entity';
-import { StudentService } from 'src/student/student.service';
+import { Role } from '../roles/entities/rol.entity';
+import { User } from '../auth/entities/user.entity';
+import { Sport } from '../sport/entities/sport.entity';
+import { Student } from '../student/entities/student.entity';
+import { StudentService } from '../student/student.service';
 import { Repository } from 'typeorm';
 import { initialData } from './data/seed-data';
 import * as bcrypt from 'bcrypt';
@@ -170,3 +170,4 @@ export class SeedService {
     return createdStudents;
   }
 }
+

@@ -1,6 +1,6 @@
 // payment.entity.ts
-import { Fee } from 'src/fee/entities/fee.entity';
-import { Student } from 'src/student/entities/student.entity';
+import { Fee } from '../../fee/entities/fee.entity';
+import { Student } from '../../student/entities/student.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 
 
@@ -35,3 +35,4 @@ export class Payment {
   @JoinColumn({ name: 'feeId' })
   fee: Fee;
 }
+
