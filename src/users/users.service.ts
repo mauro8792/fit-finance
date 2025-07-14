@@ -13,8 +13,8 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ERROR_DB } from '../constants';
-import { PaginationDto } from 'src/common/dtos/pagination.dto';
-import { User } from 'src/auth/entities/user.entity';
+import { PaginationDto } from '../common/dtos/pagination.dto';
+import { User } from '../auth/entities/user.entity';
 
 @Injectable()
 export class UsersService {
