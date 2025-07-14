@@ -4,6 +4,12 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
+  // DEBUG: Logs para Render deployment
+  console.log('🔍 DEBUG - Current working directory:', process.cwd());
+  console.log('🔍 DEBUG - __dirname:', __dirname);
+  console.log('🔍 DEBUG - process.argv:', process.argv);
+  console.log('🔍 DEBUG - Environment:', process.env.NODE_ENV);
+  
   const app = await NestFactory.create(AppModule);
   app.enableCors()
   app.setGlobalPrefix('api');
