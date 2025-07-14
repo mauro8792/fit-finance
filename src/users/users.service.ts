@@ -12,7 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ERROR_DB } from 'src/constants';
+import { ERROR_DB } from '../constants';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { User } from 'src/auth/entities/user.entity';
 

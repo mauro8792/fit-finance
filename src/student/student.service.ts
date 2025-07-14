@@ -11,7 +11,7 @@ import { DataSource, Repository } from 'typeorm';
 import { UpdateStudentDto, CreateStudentDto } from './dto';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { Student } from './entities/student.entity';
-import { ERROR_DB } from 'src/constants';
+import { ERROR_DB } from '../constants';
 import { Sport } from 'src/sport/entities/sport.entity';
 import { FeeService } from 'src/fee/fee.service';
 import { Fee } from 'src/fee/entities/fee.entity';

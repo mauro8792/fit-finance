@@ -11,7 +11,7 @@ import { DataSource, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { User } from './entities/user.entity';
-import { ERROR_DB } from 'src/constants';
+import { ERROR_DB } from '../constants';
 import { JwtPayload } from './interfaces';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto, LoginUserDto } from './dto';

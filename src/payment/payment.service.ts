@@ -14,7 +14,7 @@ import { Payment } from './entities/payment.entity';
 import { Student } from 'src/student/entities/student.entity';
 import { Fee } from 'src/fee/entities/fee.entity';
 import { FeeService } from 'src/fee/fee.service';
-import { ERROR_DB } from 'src/constants';
+import { ERROR_DB } from '../constants';
 
 @Injectable()
 export class PaymentService {
