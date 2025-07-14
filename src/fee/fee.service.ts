@@ -39,6 +39,55 @@ export class FeeService {
     return feesOfCurrentMonth;
   }
 
+  async getFeesByPeriod(month?: number, year?: number, paginationDto?: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto || {};
+
+    // Si no se proporcionan month/year, usar el mes/año actual
+    const currentDate = new Date();
+    const targetMonth = month || (currentDate.getMonth() + 1);
+    const targetYear = year || currentDate.getFullYear();
+
+    this.logger.log(`Getting fees for period: ${targetMonth}/${targetYear}`);
+
+    try {
+      const fees = await this.feeRepository.find({
+        where: {
+          ...(targetMonth && { month: targetMonth }),
+          ...(targetYear && { year: targetYear }),
+        },
+        relations: ['student', 'sport'],
+        take: limit,
+        skip: offset,
+        order: {
+          createdAt: 'DESC'
+        }
+      });
+
+      // Calcular estadísticas
+      const totalFees = fees.length;
+      const paidFees = fees.filter(fee => fee.status === 'completed').length;
+      const partialFees = fees.filter(fee => fee.status === 'partial').length;
+      const pendingFees = fees.filter(fee => fee.status === 'pending').length;
+
+      return {
+        fees,
+        statistics: {
+          total: totalFees,
+          paid: paidFees,
+          partial: partialFees,
+          pending: pendingFees
+        },
+        period: {
+          month: targetMonth,
+          year: targetYear
+        }
+      };
+    } catch (error) {
+      this.logger.error(`Error getting fees by period: ${error.message}`);
+      throw error;
+    }
+  }
+
   async findOne(term: string) {
     this.logger.log(`Get fee by ${term}`);
 

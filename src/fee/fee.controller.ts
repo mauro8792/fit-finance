@@ -30,6 +30,18 @@ export class FeeController {
     return this.feeService.findAll(paginationDto);
   }
 
+  @Get('by-period')
+  async getFeesByPeriod(
+    @Query('month') month: string,
+    @Query('year') year: string,
+    @Query() paginationDto: PaginationDto
+  ) {
+    const monthNumber = month ? parseInt(month) : undefined;
+    const yearNumber = year ? parseInt(year) : undefined;
+    
+    return this.feeService.getFeesByPeriod(monthNumber, yearNumber, paginationDto);
+  }
+
   @Get('student/:studentId/unpaid')
   async getUnpaidFeesByStudent(@Param('studentId') studentId: string) {
     const unpaidFees = await this.feeService.getUnpaidFeesByStudent(+studentId);

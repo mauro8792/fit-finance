@@ -30,7 +30,9 @@ import { TestModule } from './test/test.module';
       password: process.env.DB_PASSWORD,
       autoLoadEntities: true,
       synchronize: true,
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+      ssl: process.env.DB_HOST?.includes('neon.tech') || process.env.NODE_ENV === 'production' 
+        ? { rejectUnauthorized: false } 
+        : false,
     }),
      ScheduleModule.forRoot(),
 

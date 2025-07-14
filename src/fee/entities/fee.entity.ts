@@ -1,7 +1,7 @@
 import { Payment } from "../../payment/entities/payment.entity";
 import { Sport } from "../../sport/entities/sport.entity";
 import { Student } from "../../student/entities/student.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({ name: 'fees' })
 export class Fee {
@@ -32,6 +32,12 @@ export class Fee {
 
   @Column()
   year: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @OneToMany(() => Payment, (payment) => payment.fee, { eager: true })
   payments: Payment[];
