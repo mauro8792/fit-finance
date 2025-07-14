@@ -3,8 +3,8 @@ services:
     name: fit-finance-backend
     env: node
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: node /opt/render/project/dist/main.js
+    buildCommand: npm install && npm run build && mkdir -p src/dist && cp -r dist/* src/dist/
+    startCommand: npm run start:prod
     envVars:
       - key: NODE_ENV
         value: production
