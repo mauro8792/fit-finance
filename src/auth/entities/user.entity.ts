@@ -9,8 +9,8 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Role } from 'src/roles/entities/rol.entity';
-import { Student } from 'src/student/entities/student.entity';
+import { Role } from '../../roles/entities/rol.entity';
+import { Student } from '../../student/entities/student.entity';
 
 @Entity({ name: 'users' })
 export class User {
