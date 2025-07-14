@@ -82,7 +82,7 @@ export class MercadoPagoService {
           pending: `${this.configService.get('FRONTEND_URL')}/student/payment-pending`
         },
         payment_methods: this.getPaymentMethodsConfig(createPreferenceDto.preferredPaymentMethod),
-        notification_url: `${this.configService.get('BACKEND_URL')}/mercadopago/webhook`,
+        notification_url: `${this.configService.get('BACKEND_URL')}/api/mercadopago/webhook`,
         statement_descriptor: 'GYM_FIT_FINANCE',
         external_reference: createPreferenceDto.feeId.toString(),
         // Agregar metadata para transferencias bancarias
