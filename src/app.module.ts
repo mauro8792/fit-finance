@@ -17,6 +17,7 @@ import { SportModule } from './sport/sport.module';
 import { CronModule } from './cron/cron.module';
 import { MercadoPagoModule } from './mercadopago/mercadopago.module';
 import { TestModule } from './test/test.module';
+import { CoachModule } from './coach/coach.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { TestModule } from './test/test.module';
      ScheduleModule.forRoot(),
 
     UsersModule,
+    CoachModule,
 
     CommonModule,
 

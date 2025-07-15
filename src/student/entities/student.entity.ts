@@ -4,6 +4,7 @@ import { Fee } from '../../fee/entities/fee.entity';
 import { Payment } from '../../payment/entities/payment.entity';
 import { Sport } from '../../sport/entities/sport.entity';
 import { User } from '../../auth/entities/user.entity';
+import { Coach } from '../../coach/entities/coach.entity';
 import {
   Column,
   Entity,
@@ -61,4 +62,8 @@ export class Student {
   @OneToOne(() => User, { eager: true })
   @JoinColumn({ name: 'userId' })
   user: User;
+
+  @ManyToOne(() => Coach, (coach) => coach.students, { nullable: true, eager: false })
+  @JoinColumn({ name: 'coachId' })
+  coach: Coach;
 }
