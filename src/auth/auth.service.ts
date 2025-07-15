@@ -142,11 +142,11 @@ export class AuthService {
   }
 
   async getStudentDashboard(userId: number) {
-    // Buscar el estudiante asociado al usuario
+    // Buscar el estudiante asociado al usuario, incluyendo el coach
     const studentRepository = this.dataSource.getRepository(Student);
     const student = await studentRepository.findOne({
       where: { user: { id: userId } },
-      relations: ['sport', 'user', 'fees', 'fees.payments'],
+      relations: ['sport', 'user', 'fees', 'fees.payments', 'coach', 'coach.user'],
     });
 
     if (!student) {
@@ -210,6 +210,12 @@ export class AuthService {
         name: student.sport.name,
         monthlyFee: student.sport.monthlyFee,
       },
+      coach: student.coach ? {
+        id: student.coach.id,
+        firstName: student.coach.user?.fullName?.split(', ')[1] || '',
+        lastName: student.coach.user?.fullName?.split(', ')[0] || '',
+        email: student.coach.user?.email || '',
+      } : null,
       feesSummary: {
         totalPaid: student.fees.reduce((sum, fee) => sum + fee.amountPaid, 0),
         totalPending: student.fees.reduce((sum, fee) => sum + (fee.value - fee.amountPaid), 0),
