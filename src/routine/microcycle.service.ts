@@ -79,8 +79,11 @@ export class MicrocycleService {
   }
 
   findAll(mesocycleId: number) {
-    return this.microcycleRepo.find({ where: { mesocycle: { id: mesocycleId } }, relations: ['days'] });
-  }
+  return this.microcycleRepo.find({
+    where: { mesocycle: { id: mesocycleId } },
+    relations: ['days', 'days.exercises', 'days.exercises.sets'],
+  });
+}
 
   findOne(id: number) {
     // Incluir ejercicios y sets en la respuesta del microciclo
