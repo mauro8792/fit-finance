@@ -9,7 +9,7 @@ import { Role } from '../roles/entities/rol.entity';
 import { User } from '../auth/entities/user.entity';
 import { Sport } from '../sport/entities/sport.entity';
 import { Student } from '../student/entities/student.entity';
-import { CoachModule } from 'src/coach/coach.module';
+import { CoachModule } from '../coach/coach.module';
 
 @Module({
   controllers: [SeedController],
