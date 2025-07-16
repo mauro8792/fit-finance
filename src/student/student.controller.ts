@@ -1,3 +1,4 @@
+  
 import {
   Controller,
   Get,
@@ -42,5 +43,10 @@ export class StudentController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.studentService.remove(+id);
+  }
+
+  @Get('coach/:coachUserId')
+  findByCoach(@Param('coachUserId') coachUserId: string) {
+    return this.studentService.findByCoachUserId(+coachUserId);
   }
 }

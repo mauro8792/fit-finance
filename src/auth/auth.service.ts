@@ -87,11 +87,22 @@ export class AuthService {
       throw new UnauthorizedException('Credential are not valid (password)');
     }
 
-    // Verificar si es un estudiante (rol 'user')
-    const isStudent = user.roles.some(role => role.name === 'user');
-    let studentInfo = null;
+    // Mapear roles a userTypes
+    const userTypes: string[] = user.roles.map(role => {
+      if (role.name === 'user') return 'student';
+      if (role.name === 'coach') return 'coach';
+      if (role.name === 'admin') return 'admin';
+      return role.name;
+    });
 
-    if (isStudent) {
+    // Elegir el userType principal (prioridad: student > coach > admin)
+    let mainUserType = 'admin';
+    if (userTypes.includes('student')) mainUserType = 'student';
+    else if (userTypes.includes('coach')) mainUserType = 'coach';
+    else if (userTypes.length > 0) mainUserType = userTypes[0];
+
+    let studentInfo = null;
+    if (userTypes.includes('student')) {
       // Buscar información del estudiante
       const studentRepository = this.dataSource.getRepository(Student);
       const student = await studentRepository.findOne({
@@ -119,12 +130,15 @@ export class AuthService {
     }
 
     const { id, password: _, ...userData } = user;
-    
+
+    // Siempre incluir id en la raíz de la respuesta para compatibilidad frontend
     return {
+      id, // <-- importante para coach/admin
       ...userData,
       token: this.getJwtToken({ id }),
       student: studentInfo,
-      userType: isStudent ? 'student' : 'admin'
+      userTypes, // array de roles traducidos
+      userType: mainUserType // principal para compatibilidad frontend
     };
   }
 

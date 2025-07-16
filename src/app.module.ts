@@ -18,6 +18,7 @@ import { CronModule } from './cron/cron.module';
 import { MercadoPagoModule } from './mercadopago/mercadopago.module';
 import { TestModule } from './test/test.module';
 import { CoachModule } from './coach/coach.module';
+import { RoutineModule } from './routine/routine.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { CoachModule } from './coach/coach.module';
     MercadoPagoModule,
 
     TestModule,
+    RoutineModule,
   ],
   controllers: [AppController],
   providers: [AppService],

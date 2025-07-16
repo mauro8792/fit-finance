@@ -1,3 +1,6 @@
+// ...existing code...
+
+
 import {
   BadRequestException,
   Injectable,
@@ -203,5 +206,18 @@ export class StudentService {
         this.logger.log(`Fee generated for student ${student.id}: ${startDate.toDateString()} - ${endDate.toDateString()}`);
       }
     }
+  }
+
+    async findByCoachUserId(coachUserId: number) {
+    // Busca el coach por el userId
+    const students = await this.studentRepository
+      .createQueryBuilder('student')
+      .leftJoinAndSelect('student.user', 'user')
+      .leftJoinAndSelect('student.sport', 'sport')
+      .leftJoinAndSelect('student.coach', 'coach')
+      .leftJoinAndSelect('coach.user', 'coachUser')
+      .where('coachUser.id = :coachUserId', { coachUserId })
+      .getMany();
+    return students;
   }
 }

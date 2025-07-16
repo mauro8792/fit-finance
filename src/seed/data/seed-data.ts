@@ -36,6 +36,7 @@ interface SeedCoach {
   password: string;
   salary?: number;
   specialty?: string;
+  roles?: string[]; // Roles del coach, por defecto puede ser solo 'coach'
 }
 
 interface SeedData {
@@ -57,6 +58,7 @@ export const initialData: SeedData = {
     {
       name: 'super-admin',
     },
+     { name: 'coach' },
   ],
   users: [
     {
@@ -71,6 +73,25 @@ export const initialData: SeedData = {
       password: 'User123!',
       roles: ['user'],
     },
+    // // Coaches como usuarios
+    // {
+    //   email: 'brian@fitfinance.com',
+    //   fullName: 'Brian Gómez',
+    //   password: 'Coach123!',
+    //   roles: ['coach'],
+    // },
+    // {
+    //   email: 'lautaro@fitfinance.com',
+    //   fullName: 'Lautaro Pérez',
+    //   password: 'Coach123!',
+    //   roles: ['coach'],
+    // },
+    // {
+    //   email: 'mauro@fitfinance.com',
+    //   fullName: 'Mauro Yini',
+    //   password: 'Coach123!',
+    //   roles: ['coach'],
+    // },
   ],
   coaches: [
     {
@@ -80,6 +101,7 @@ export const initialData: SeedData = {
       password: 'Coach123!',
       salary: 200000,
       specialty: 'Fuerza',
+      roles: ['coach'],
     },
     {
       firstName: 'Lautaro',
@@ -88,6 +110,7 @@ export const initialData: SeedData = {
       password: 'Coach123!',
       salary: 180000,
       specialty: 'Hipertrofia',
+      roles: ['coach'],
     },
     {
       firstName: 'Mauro',
@@ -96,6 +119,7 @@ export const initialData: SeedData = {
       password: 'Coach123!',
       salary: 220000,
       specialty: 'Funcional',
+      roles: ['coach'],
     },
   ],
   sports: [
