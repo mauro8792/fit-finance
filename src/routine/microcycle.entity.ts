@@ -13,6 +13,16 @@ export class Microcycle {
   @ManyToOne(() => Mesocycle, meso => meso.microcycles, { onDelete: 'CASCADE' })
   mesocycle: Mesocycle;
 
+  @Column({ type: 'date' })
+  startDate: string;
+
+  @Column({ type: 'date' })
+  endDate: string;
+
+
+  @Column({ nullable: true })
+  objetivo?: string;
+
   @OneToMany(() => Day, day => day.microcycle, { cascade: true })
   days: Day[];
 

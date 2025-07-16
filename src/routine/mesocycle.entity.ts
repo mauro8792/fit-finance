@@ -13,6 +13,12 @@ export class Mesocycle {
   @ManyToOne(() => Macrocycle, macro => macro.mesocycles, { onDelete: 'CASCADE' })
   macrocycle: Macrocycle;
 
+  @Column({ type: 'date', nullable: true })
+  startDate: Date;
+
+  @Column({ type: 'date', nullable: true })
+  endDate: Date;
+
   @OneToMany(() => Microcycle, micro => micro.mesocycle, { cascade: true })
   microcycles: Microcycle[];
 

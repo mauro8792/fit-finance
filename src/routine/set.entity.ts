@@ -6,20 +6,22 @@ export class SetEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  reps: string;
 
-  @Column()
-  load: string;
 
-  @Column()
+  @Column('int')
+  reps: number;
+
+  @Column('int')
+  load: number;
+
+  @Column({ nullable: true })
   expectedRir: string;
 
-  @Column()
-  actualRir: string;
+  @Column('int', { nullable: true })
+  actualRir: number;
 
-  @Column()
-  actualRpe: string;
+  @Column('int', { nullable: true })
+  actualRpe: number;
 
   @Column({ nullable: true })
   notes: string;

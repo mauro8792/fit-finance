@@ -10,7 +10,7 @@ export class Day {
   @Column()
   number: number;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', nullable: true })
   date: string;
 
   @ManyToOne(() => Microcycle, micro => micro.days, { onDelete: 'CASCADE' })

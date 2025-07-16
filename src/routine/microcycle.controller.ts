@@ -1,5 +1,7 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, ParseIntPipe } from '@nestjs/common';
+
+import { Controller, Get, Post, Body, Param, Patch, Put, Delete, ParseIntPipe } from '@nestjs/common';
 import { MicrocycleService } from './microcycle.service';
+import { CreateMicrocycleDto } from './dto/create-microcycle.dto';
 
 @Controller('microcycle')
 export class MicrocycleController {
@@ -8,7 +10,7 @@ export class MicrocycleController {
   @Post(':mesocycleId')
   create(
     @Param('mesocycleId', ParseIntPipe) mesocycleId: number,
-    @Body() data: any,
+    @Body() data: CreateMicrocycleDto,
   ) {
     return this.microcycleService.create(mesocycleId, data);
   }
@@ -25,6 +27,11 @@ export class MicrocycleController {
 
   @Patch(':id')
   update(@Param('id', ParseIntPipe) id: number, @Body() data: any) {
+    return this.microcycleService.update(id, data);
+  }
+
+  @Put(':id')
+  replace(@Param('id', ParseIntPipe) id: number, @Body() data: any) {
     return this.microcycleService.update(id, data);
   }
 
